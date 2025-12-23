@@ -1,0 +1,661 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  Zap,
+  Workflow,
+  Puzzle,
+  DollarSign,
+  ArrowRight,
+  Play,
+  Code,
+  Webhook,
+  Bot,
+  FileText,
+  GitBranch,
+  Shield,
+  Clock,
+  Users,
+  Check,
+  Sparkles,
+} from "lucide-react";
+
+// Animated pixel background component
+function PixelBackground() {
+  const [pixels, setPixels] = useState<Array<{ id: number; x: number; y: number; delay: number; duration: number }>>([]);
+
+  useEffect(() => {
+    const newPixels = Array.from({ length: 50 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 5,
+      duration: 3 + Math.random() * 4,
+    }));
+    setPixels(newPixels);
+  }, []);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Grid pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #3b82f6 1px, transparent 1px),
+            linear-gradient(to bottom, #3b82f6 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px',
+        }}
+      />
+      {/* Animated pixels */}
+      {pixels.map((pixel) => (
+        <div
+          key={pixel.id}
+          className="absolute w-2 h-2 bg-blue-400/20 rounded-sm animate-pulse"
+          style={{
+            left: `${pixel.x}%`,
+            top: `${pixel.y}%`,
+            animationDelay: `${pixel.delay}s`,
+            animationDuration: `${pixel.duration}s`,
+          }}
+        />
+      ))}
+      {/* Floating gradient orbs */}
+      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-blob" />
+      <div className="absolute top-40 right-20 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
+      <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-indigo-400/10 rounded-full blur-3xl animate-blob animation-delay-4000" />
+    </div>
+  );
+}
+
+// Animated workflow node component
+function AnimatedNode({
+  children,
+  delay = 0,
+  className = ""
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+
+  return (
+    <div
+      className={`transform transition-all duration-700 ease-out ${
+        isVisible
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 translate-y-4"
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+// Animated connection line
+function AnimatedConnection({ delay = 0 }: { delay?: number }) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+
+  return (
+    <div className="relative h-8 flex items-center justify-center">
+      <div
+        className={`w-0.5 bg-gradient-to-b from-blue-300 to-blue-400 transition-all duration-500 ease-out ${
+          isVisible ? "h-8" : "h-0"
+        }`}
+      />
+      <div
+        className={`absolute bottom-0 w-2 h-2 bg-blue-400 rounded-full transition-all duration-300 ${
+          isVisible ? "opacity-100 scale-100" : "opacity-0 scale-0"
+        }`}
+        style={{ transitionDelay: "300ms" }}
+      />
+    </div>
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">Flowys</span>
+          </div>
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Features
+            </Link>
+            <Link href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Pricing
+            </Link>
+            <Link href="/docs" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Docs
+            </Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/workflow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center gap-2 shadow-md shadow-blue-500/20"
+            >
+              Open Editor
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-blue-50/50 to-white relative overflow-hidden">
+        <PixelBackground />
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-8">
+            <Sparkles className="w-4 h-4" />
+            Simple automation for everyone
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+            Build powerful workflows
+            <br />
+            <span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+              without the complexity
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed">
+            Connect your favorite tools, automate repetitive tasks, and let AI do the heavy lifting.
+            No coding required. Simple pricing, powerful results.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/workflow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-lg shadow-blue-500/25"
+            >
+              <Play className="w-5 h-5" />
+              Start Building
+            </Link>
+            <Link
+              href="/docs"
+              className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-gray-50 border border-gray-200 text-gray-900 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-sm"
+            >
+              <FileText className="w-5 h-5" />
+              Read the Docs
+            </Link>
+          </div>
+        </div>
+
+        {/* Animated Visual Preview */}
+        <div className="max-w-6xl mx-auto mt-16 relative z-10">
+          <div className="relative rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-2 shadow-2xl shadow-blue-500/10">
+            {/* Glowing border effect */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-sky-500 rounded-2xl opacity-20 blur-sm" />
+            <div className="relative rounded-xl bg-gradient-to-br from-slate-50 to-blue-50/50 p-8 min-h-[400px] flex items-center justify-center overflow-hidden">
+              {/* Inner grid pattern */}
+              <div
+                className="absolute inset-0 opacity-[0.02]"
+                style={{
+                  backgroundImage: `
+                    linear-gradient(to right, #3b82f6 1px, transparent 1px),
+                    linear-gradient(to bottom, #3b82f6 1px, transparent 1px)
+                  `,
+                  backgroundSize: '20px 20px',
+                }}
+              />
+              <div className="flex items-center gap-8 relative">
+                {/* Sample workflow nodes with animations */}
+                <div className="flex flex-col items-center">
+                  <AnimatedNode delay={200}>
+                    <div className="px-6 py-4 bg-white border-2 border-emerald-200 rounded-xl text-emerald-700 font-medium flex items-center gap-3 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 hover:scale-105 transition-all duration-300 cursor-default">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                        <Webhook className="w-5 h-5" />
+                      </div>
+                      <span>Webhook Trigger</span>
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    </div>
+                  </AnimatedNode>
+                  <AnimatedConnection delay={500} />
+                  <AnimatedNode delay={800}>
+                    <div className="px-6 py-4 bg-white border-2 border-blue-200 rounded-xl text-blue-700 font-medium flex items-center gap-3 shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 hover:scale-105 transition-all duration-300 cursor-default">
+                      <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <Bot className="w-5 h-5" />
+                      </div>
+                      <span>AI Process</span>
+                      <div className="flex gap-0.5">
+                        <div className="w-1.5 h-3 bg-blue-400 rounded-full animate-pulse" />
+                        <div className="w-1.5 h-3 bg-blue-300 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+                        <div className="w-1.5 h-3 bg-blue-200 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  </AnimatedNode>
+                  <AnimatedConnection delay={1100} />
+                  <AnimatedNode delay={1400}>
+                    <div className="px-6 py-4 bg-white border-2 border-amber-200 rounded-xl text-amber-700 font-medium flex items-center gap-3 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 hover:scale-105 transition-all duration-300 cursor-default">
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                        <Code className="w-5 h-5" />
+                      </div>
+                      <span>Transform Data</span>
+                    </div>
+                  </AnimatedNode>
+                </div>
+
+                <AnimatedNode delay={1700} className="flex items-center">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-0.5 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full" />
+                    <ArrowRight className="w-6 h-6 text-blue-400 animate-pulse" />
+                  </div>
+                </AnimatedNode>
+
+                <AnimatedNode delay={2000}>
+                  <div className="px-8 py-6 bg-gradient-to-br from-blue-500 to-blue-600 border-2 border-blue-400 rounded-xl text-white font-medium flex items-center gap-3 shadow-xl shadow-blue-500/30 hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300 cursor-default">
+                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-blue-100 text-xs uppercase tracking-wide">Output</div>
+                      <div className="text-lg">Automated Result</div>
+                    </div>
+                    <div className="w-3 h-3 rounded-full bg-green-400 animate-ping" />
+                  </div>
+                </AnimatedNode>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Value Props */}
+      <section className="py-20 px-6 border-y border-gray-100">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-emerald-100 border border-emerald-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Puzzle className="w-8 h-8 text-emerald-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Drag. Drop. Done.</h3>
+            <p className="text-gray-600 leading-relaxed">
+              Build complex automations visually. If you can draw a flowchart, you can build a workflow.
+              Zero learning curve.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 border border-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Workflow className="w-8 h-8 text-blue-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Infinitely Flexible</h3>
+            <p className="text-gray-600 leading-relaxed">
+              From simple notifications to complex AI pipelines. Conditions, loops, API calls, webhooks -
+              build anything you imagine.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-amber-100 border border-amber-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <DollarSign className="w-8 h-8 text-amber-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Affordable Pricing</h3>
+            <p className="text-gray-600 leading-relaxed">
+              No hidden fees, no per-seat pricing. Simple, transparent pricing that scales with your needs.
+              Pay only for what you use.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Everything you need to automate
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Powerful features that make automation accessible to everyone,
+              from beginners to power users.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                icon: Bot,
+                title: "AI-Powered Nodes",
+                description: "Let AI generate content, analyze data, or make decisions right inside your workflows.",
+                color: "blue",
+              },
+              {
+                icon: Webhook,
+                title: "Webhooks & APIs",
+                description: "Connect with any service. Trigger workflows from external events or push data anywhere.",
+                color: "emerald",
+              },
+              {
+                icon: GitBranch,
+                title: "Conditional Logic",
+                description: "Branch your workflows based on conditions. Handle every scenario automatically.",
+                color: "sky",
+              },
+              {
+                icon: Clock,
+                title: "Scheduled Runs",
+                description: "Run workflows on a schedule. Daily reports, weekly cleanups, hourly checks - you decide.",
+                color: "amber",
+              },
+              {
+                icon: Shield,
+                title: "Secure by Default",
+                description: "API keys, signatures, and scopes. Your data stays safe with enterprise-grade security.",
+                color: "rose",
+              },
+              {
+                icon: Users,
+                title: "Team Collaboration",
+                description: "Share workflows with your team. Build together, deploy together.",
+                color: "indigo",
+              },
+            ].map((feature) => (
+              <div
+                key={feature.title}
+                className="p-6 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-200"
+              >
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
+                    feature.color === "blue"
+                      ? "bg-blue-100 border border-blue-200"
+                      : feature.color === "emerald"
+                      ? "bg-emerald-100 border border-emerald-200"
+                      : feature.color === "sky"
+                      ? "bg-sky-100 border border-sky-200"
+                      : feature.color === "amber"
+                      ? "bg-amber-100 border border-amber-200"
+                      : feature.color === "rose"
+                      ? "bg-rose-100 border border-rose-200"
+                      : "bg-indigo-100 border border-indigo-200"
+                  }`}
+                >
+                  <feature.icon
+                    className={`w-6 h-6 ${
+                      feature.color === "blue"
+                        ? "text-blue-600"
+                        : feature.color === "emerald"
+                        ? "text-emerald-600"
+                        : feature.color === "sky"
+                        ? "text-sky-600"
+                        : feature.color === "amber"
+                        ? "text-amber-600"
+                        : feature.color === "rose"
+                        ? "text-rose-600"
+                        : "text-indigo-600"
+                    }`}
+                  />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-24 px-6 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              From idea to automation in minutes
+            </h2>
+            <p className="text-xl text-gray-600">
+              Three simple steps. No engineering degree required.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className="relative">
+              <div className="absolute -left-4 -top-4 w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                1
+              </div>
+              <div className="pt-8 pl-4">
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Choose your trigger</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Start with a webhook, schedule, or manual trigger. This is what kicks off your automation.
+                </p>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute -left-4 -top-4 w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                2
+              </div>
+              <div className="pt-8 pl-4">
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Add your logic</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Drag nodes onto the canvas. Connect them together. Add conditions, AI, transformations - whatever you need.
+                </p>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute -left-4 -top-4 w-12 h-12 bg-blue-400 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                3
+              </div>
+              <div className="pt-8 pl-4">
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Run and relax</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Hit run. Watch it work. Your workflow handles the rest while you focus on what matters.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Simple, credit-based pricing
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Pay for what you use. Credits refresh monthly. Unused credits roll over.
+            </p>
+          </div>
+
+          {/* Credits explainer */}
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-12 max-w-3xl mx-auto">
+            <h4 className="font-semibold text-gray-900 mb-3">How credits work:</h4>
+            <div className="grid sm:grid-cols-3 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="text-gray-600">Basic nodes: <strong className="text-gray-900">1 credit</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="text-gray-600">AI nodes: <strong className="text-gray-900">10 credits</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                <span className="text-gray-600">Webhooks: <strong className="text-gray-900">1 credit</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Starter Tier */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
+              <h3 className="text-lg font-medium text-gray-500 mb-2">Starter</h3>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-5xl font-bold text-gray-900">$9</span>
+                <span className="text-gray-500">/month</span>
+              </div>
+              <p className="text-blue-600 font-medium mb-6">500 credits/month</p>
+              <p className="text-gray-600 mb-8">Perfect for personal projects.</p>
+              <ul className="space-y-4 mb-8">
+                {[
+                  "Unlimited workflows",
+                  "All node types",
+                  "Webhook triggers",
+                  "Community support",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-gray-700">
+                    <Check className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/workflow"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3 text-center bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-xl transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
+
+            {/* Pro Tier */}
+            <div className="rounded-2xl border-2 border-blue-500 bg-white p-8 relative shadow-xl shadow-blue-500/10">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
+                Most Popular
+              </div>
+              <h3 className="text-lg font-medium text-gray-500 mb-2">Pro</h3>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-5xl font-bold text-gray-900">$29</span>
+                <span className="text-gray-500">/month</span>
+              </div>
+              <p className="text-blue-600 font-medium mb-6">2,500 credits/month</p>
+              <p className="text-gray-600 mb-8">For growing teams and businesses.</p>
+              <ul className="space-y-4 mb-8">
+                {[
+                  "Everything in Starter",
+                  "API access",
+                  "Priority execution",
+                  "Priority support",
+                  "Credit rollover",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-gray-700">
+                    <Check className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/workflow"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3 text-center bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all shadow-md"
+              >
+                Get Started
+              </Link>
+            </div>
+
+            {/* Business Tier */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
+              <h3 className="text-lg font-medium text-gray-500 mb-2">Business</h3>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-5xl font-bold text-gray-900">$79</span>
+                <span className="text-gray-500">/month</span>
+              </div>
+              <p className="text-blue-600 font-medium mb-6">10,000 credits/month</p>
+              <p className="text-gray-600 mb-8">For scaling organizations.</p>
+              <ul className="space-y-4 mb-8">
+                {[
+                  "Everything in Pro",
+                  "Team collaboration",
+                  "Advanced analytics",
+                  "Custom integrations",
+                  "Dedicated support",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-gray-700">
+                    <Check className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/workflow"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3 text-center bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-xl transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+
+          {/* Enterprise callout */}
+          <div className="mt-12 text-center">
+            <p className="text-gray-600">
+              Need more credits or custom features?{" "}
+              <button className="text-blue-600 font-medium hover:underline">
+                Contact us for Enterprise pricing
+              </button>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 px-6 bg-gradient-to-br from-blue-600 to-blue-700">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to automate?
+          </h2>
+          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+            Join teams who stopped doing repetitive tasks manually.
+            Your first workflow is just a few clicks away.
+          </p>
+          <Link
+            href="/workflow"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-white hover:bg-gray-50 text-blue-700 font-semibold rounded-xl transition-all duration-200 text-lg shadow-lg"
+          >
+            <Zap className="w-6 h-6" />
+            Start Building Now
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-gray-100 bg-white">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-bold text-gray-900">Flowys</span>
+          </div>
+          <div className="flex items-center gap-8 text-sm text-gray-600">
+            <Link href="/docs" className="hover:text-gray-900 transition-colors">
+              Documentation
+            </Link>
+            <Link href="/privacy" className="hover:text-gray-900 transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-gray-900 transition-colors">
+              Terms
+            </Link>
+          </div>
+          <p className="text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} Flowys. All rights reserved.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
