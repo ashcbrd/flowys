@@ -37,3 +37,11 @@ export {
   WorkflowVersion,
   type IWorkflowVersion,
 } from "./models/WorkflowVersion";
+
+export {
+  Schedule,
+  type ISchedule,
+  type ScheduleFrequency,
+  frequencyToCron,
+  getNextRunTime,
+} from "./models/Schedule";

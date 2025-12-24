@@ -155,6 +155,39 @@ export interface ApiKey {
   updatedAt: string;
 }
 
+export type ScheduleFrequency =
+  | "every_minute"
+  | "every_5_minutes"
+  | "every_15_minutes"
+  | "every_30_minutes"
+  | "hourly"
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "custom";
+
+export interface Schedule {
+  id: string;
+  workflowId: string;
+  name: string;
+  description?: string;
+  frequency: ScheduleFrequency;
+  cronExpression: string;
+  timezone: string;
+  input?: Record<string, unknown>;
+  enabled: boolean;
+  lastRunAt?: string;
+  nextRunAt?: string;
+  lastRunStatus?: "success" | "failed";
+  lastRunError?: string;
+  lastExecutionId?: string;
+  totalRuns: number;
+  successfulRuns: number;
+  failedRuns: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 async function fetchApi<T>(
   endpoint: string,
   options?: RequestInit
@@ -195,10 +228,10 @@ export const api = {
       }),
     delete: (id: string) =>
       fetchApi<void>(`/api/workflows/${id}`, { method: "DELETE" }),
-    execute: (id: string, input?: Record<string, unknown>) =>
+    execute: (id: string, data?: { input?: Record<string, unknown>; nodes?: NodeData[]; edges?: EdgeData[] }) =>
       fetchApi<Execution>(`/api/workflows/${id}/execute`, {
         method: "POST",
-        body: JSON.stringify({ input }),
+        body: JSON.stringify(data || {}),
       }),
     duplicate: (id: string, name?: string) =>
       fetchApi<Workflow>(`/api/workflows/${id}/duplicate`, {
@@ -400,5 +433,59 @@ export const api = {
       }),
     delete: (id: string) =>
       fetchApi<{ success: boolean }>(`/api/api-keys/${id}`, { method: "DELETE" }),
+  },
+  schedules: {
+    list: (params?: { workflowId?: string; enabled?: boolean }) => {
+      const searchParams = new URLSearchParams();
+      if (params?.workflowId) searchParams.set("workflowId", params.workflowId);
+      if (params?.enabled !== undefined) searchParams.set("enabled", String(params.enabled));
+      const query = searchParams.toString();
+      return fetchApi<Schedule[]>(`/api/schedules${query ? `?${query}` : ""}`);
+    },
+    get: (id: string) => fetchApi<Schedule>(`/api/schedules/${id}`),
+    create: (data: {
+      workflowId: string;
+      name: string;
+      description?: string;
+      frequency: ScheduleFrequency;
+      cronExpression?: string;
+      timezone?: string;
+      input?: Record<string, unknown>;
+      enabled?: boolean;
+      hour?: number;
+      minute?: number;
+      dayOfWeek?: number;
+      dayOfMonth?: number;
+    }) =>
+      fetchApi<Schedule>("/api/schedules", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    update: (
+      id: string,
+      data: Partial<{
+        name: string;
+        description: string;
+        frequency: ScheduleFrequency;
+        cronExpression: string;
+        timezone: string;
+        input: Record<string, unknown>;
+        enabled: boolean;
+        hour: number;
+        minute: number;
+        dayOfWeek: number;
+        dayOfMonth: number;
+      }>
+    ) =>
+      fetchApi<Schedule>(`/api/schedules/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    delete: (id: string) =>
+      fetchApi<{ success: boolean }>(`/api/schedules/${id}`, { method: "DELETE" }),
+    trigger: (id: string) =>
+      fetchApi<{ success: boolean; executionId?: string; error?: string }>(`/api/schedules/${id}`, {
+        method: "POST",
+      }),
   },
 };

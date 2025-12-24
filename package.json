@@ -27,6 +27,7 @@
     "lucide-react": "^0.460.0",
     "mongoose": "^8.8.4",
     "next": "^16.1.1",
+    "node-cron": "^4.2.1",
     "openai": "^4.73.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.9.3",
+    "@types/node-cron": "^3.0.11",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/uuid": "^10.0.0",

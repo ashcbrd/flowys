@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   Copy,
   History,
+  FileEdit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,7 +61,7 @@ export function WorkflowsDialog({ open: controlledOpen, onOpenChange }: Workflow
   const [selectedWorkflowForVersions, setSelectedWorkflowForVersions] = useState<Workflow | null>(null);
 
   const router = useRouter();
-  const { loadWorkflow } = useWorkflowStore();
+  const { loadWorkflow, hasDraft, loadDraft, draftWorkflow } = useWorkflowStore();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -219,7 +220,20 @@ export function WorkflowsDialog({ open: controlledOpen, onOpenChange }: Workflow
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSecs < 60) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
   };
 
   const isControlled = controlledOpen !== undefined;
@@ -237,8 +251,47 @@ export function WorkflowsDialog({ open: controlledOpen, onOpenChange }: Workflow
         )}
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Saved Workflows</DialogTitle>
+            <DialogTitle>Workflows</DialogTitle>
           </DialogHeader>
+
+          {/* Draft Section */}
+          {hasDraft() && draftWorkflow && (
+            <div className="border-b pb-4 mb-2">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                <FileEdit className="h-4 w-4" />
+                Draft
+              </h3>
+              <div
+                className="border rounded-lg p-3 hover:bg-muted/50 cursor-pointer flex items-center justify-between"
+                onClick={() => {
+                  loadDraft();
+                  setOpen(false);
+                  router.push("/workflow");
+                  toast({
+                    title: "Draft Loaded",
+                    description: "Your unsaved draft has been restored",
+                  });
+                }}
+              >
+                <div>
+                  <h4 className="font-medium">Unsaved Draft</h4>
+                  <p className="text-xs text-muted-foreground">
+                    {draftWorkflow.nodes.length} nodes · Last modified{" "}
+                    {formatDate(draftWorkflow.lastModified)}
+                  </p>
+                </div>
+                <Button variant="ghost" size="sm" title="Load Draft">
+                  <Play className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Saved Workflows Section */}
+          <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+            <FolderOpen className="h-4 w-4" />
+            Saved Workflows
+          </h3>
 
           {/* Toolbar with Select All and Bulk Delete */}
           {workflows.length > 0 && (
@@ -322,7 +375,10 @@ export function WorkflowsDialog({ open: controlledOpen, onOpenChange }: Workflow
                         <div>
                           <h3 className="font-medium">{workflow.name}</h3>
                           <p className="text-xs text-muted-foreground">
-                            {workflow.nodes.length} nodes · Updated {formatDate(workflow.updatedAt)}
+                            {workflow.nodes.length} nodes ·{" "}
+                            <span title={new Date(workflow.updatedAt).toLocaleString()}>
+                              Modified {formatDate(workflow.updatedAt)}
+                            </span>
                           </p>
                         </div>
                       </div>

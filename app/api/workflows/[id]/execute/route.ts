@@ -20,6 +20,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const executionId = uuid();
     const now = new Date();
 
+    // Use nodes/edges from request body if provided (for unsaved changes),
+    // otherwise fall back to the saved workflow from database
+    const nodesToExecute = body?.nodes && body.nodes.length > 0 ? body.nodes : workflow.nodes;
+    const edgesToExecute = body?.edges ? body.edges : workflow.edges;
+
     await Execution.create({
       _id: executionId,
       workflowId: workflow._id,
@@ -28,7 +33,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       startedAt: now,
     });
 
-    const executor = createExecutor(workflow.nodes, workflow.edges);
+    const executor = createExecutor(nodesToExecute, edgesToExecute);
     const result = await executor.execute(body?.input || {});
 
     const execution = await Execution.findByIdAndUpdate(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { WorkflowCanvas } from "@/components/canvas/WorkflowCanvas";
 import { Sidebar } from "@/components/panels/Sidebar";
@@ -17,18 +17,58 @@ interface WorkflowEditorProps {
 
 export function WorkflowEditor({ workflowId, versionId }: WorkflowEditorProps) {
   const router = useRouter();
+  const hasInitialized = useRef(false);
+  const hasLoadedWorkflow = useRef<string | null>(null);
   const {
     loadWorkflow,
-    currentWorkflowId,
     workflow,
+    nodes,
+    workflowStatus,
     setNodes,
     setEdges,
-    newWorkflow,
+    hydrateFromStorage,
+    isHydrated,
   } = useWorkflowStore();
 
+  // Check if there are unsaved changes
+  const hasUnsavedChanges = useCallback(() => {
+    return nodes.length > 0 && (workflowStatus === "draft" || workflowStatus === "modified");
+  }, [nodes.length, workflowStatus]);
+
+  // Warn user before leaving page with unsaved changes
   useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges()) {
+        e.preventDefault();
+        // Modern browsers require returnValue to be set
+        e.returnValue = "";
+        return "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  // Hydrate from storage on mount
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      hydrateFromStorage();
+    }
+  }, [hydrateFromStorage]);
+
+  // Load workflow from URL - only run when URL params change
+  useEffect(() => {
+    // Wait for hydration before doing any routing
+    if (!isHydrated) return;
+
     const loadFromUrl = async () => {
       if (workflowId) {
+        // Skip if we already loaded this workflow
+        if (hasLoadedWorkflow.current === workflowId) return;
+        hasLoadedWorkflow.current = workflowId;
+
         try {
           if (versionId) {
             // Load a specific version
@@ -45,17 +85,31 @@ export function WorkflowEditor({ workflowId, versionId }: WorkflowEditorProps) {
           }
         } catch (error) {
           console.error("Failed to load workflow:", error);
+          hasLoadedWorkflow.current = null;
           // Redirect to new workflow if not found
           router.replace("/workflow");
         }
-      } else if (currentWorkflowId && !workflowId) {
-        // If we have a stored workflow ID but no URL param, redirect to it
-        router.replace(`/workflow/${currentWorkflowId}`);
+      } else {
+        // No workflowId in URL - this is either /workflow or after newWorkflow()
+        hasLoadedWorkflow.current = null;
       }
     };
 
     loadFromUrl();
-  }, [workflowId, versionId, loadWorkflow, currentWorkflowId, router, setNodes, setEdges]);
+  }, [workflowId, versionId, loadWorkflow, router, setNodes, setEdges, isHydrated]);
+
+  // Redirect to stored workflow on initial load (only if no URL param)
+  useEffect(() => {
+    if (!isHydrated) return;
+    if (workflowId) return; // Already have a workflow in URL
+    if (hasLoadedWorkflow.current) return; // Already loaded something
+
+    // Get fresh state to check currentWorkflowId
+    const storedId = useWorkflowStore.getState().currentWorkflowId;
+    if (storedId) {
+      router.replace(`/workflow/${storedId}`);
+    }
+  }, [isHydrated, workflowId, router]);
 
   // Update URL when workflow is saved
   useEffect(() => {

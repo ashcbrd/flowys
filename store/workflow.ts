@@ -35,6 +35,15 @@ export interface GeneratedWorkflow {
   edges: GeneratedEdge[];
 }
 
+export type WorkflowStatus = "draft" | "saved" | "modified";
+
+interface DraftWorkflow {
+  nodes: WorkflowNode[];
+  edges: Edge[];
+  name?: string;
+  lastModified: string;
+}
+
 interface HistoryState {
   nodes: WorkflowNode[];
   edges: Edge[];
@@ -46,10 +55,14 @@ interface WorkflowState {
   selectedNode: WorkflowNode | null;
   workflow: Workflow | null;
   currentWorkflowId: string | null;
+  workflowStatus: WorkflowStatus;
   isExecuting: boolean;
   executionLogs: ExecutionLog[];
   lastExecution: Execution | null;
   isHydrated: boolean;
+
+  // Draft support
+  draftWorkflow: DraftWorkflow | null;
 
   // History for undo/redo
   history: HistoryState[];
@@ -73,6 +86,11 @@ interface WorkflowState {
   newWorkflow: () => void;
   createWorkflow: (workflow: GeneratedWorkflow) => void;
   hydrateFromStorage: () => Promise<void>;
+  saveDraft: () => void;
+  loadDraft: () => boolean;
+  clearDraft: () => void;
+  hasDraft: () => boolean;
+  getWorkflowStatus: () => WorkflowStatus;
 
   // Undo/Redo
   pushHistory: () => void;
@@ -142,10 +160,14 @@ export const useWorkflowStore = create<WorkflowState>()(
       selectedNode: null,
       workflow: null,
       currentWorkflowId: null,
+      workflowStatus: "draft" as WorkflowStatus,
       isExecuting: false,
       executionLogs: [],
       lastExecution: null,
       isHydrated: false,
+
+      // Draft support
+      draftWorkflow: null,
 
       // History state
       history: [],
@@ -233,9 +255,16 @@ export const useWorkflowStore = create<WorkflowState>()(
         if (isStructuralChange) {
           get().pushHistory();
         }
+        const newNodes = applyNodeChanges(changes, get().nodes) as WorkflowNode[];
+        const { workflow, workflowStatus } = get();
         set({
-          nodes: applyNodeChanges(changes, get().nodes) as WorkflowNode[],
+          nodes: newNodes,
+          workflowStatus: workflow ? "modified" : workflowStatus,
         });
+        // Auto-save draft on structural changes
+        if (isStructuralChange) {
+          get().saveDraft();
+        }
       },
 
       onEdgesChange: (changes) => {
@@ -245,19 +274,29 @@ export const useWorkflowStore = create<WorkflowState>()(
         if (isStructuralChange) {
           get().pushHistory();
         }
+        const newEdges = applyEdgeChanges(changes, get().edges);
+        const { workflow, workflowStatus } = get();
         set({
-          edges: applyEdgeChanges(changes, get().edges),
+          edges: newEdges,
+          workflowStatus: workflow ? "modified" : workflowStatus,
         });
+        // Auto-save draft on structural changes
+        if (isStructuralChange) {
+          get().saveDraft();
+        }
       },
 
       onConnect: (connection) => {
         get().pushHistory();
+        const { workflow, workflowStatus } = get();
         set({
           edges: addEdge(
             { ...connection, id: `edge_${Date.now()}` },
             get().edges
           ),
+          workflowStatus: workflow ? "modified" : workflowStatus,
         });
+        get().saveDraft();
       },
 
       addNode: (type, position) => {
@@ -272,7 +311,12 @@ export const useWorkflowStore = create<WorkflowState>()(
             config: { ...defaultConfigs[type] },
           },
         };
-        set({ nodes: [...get().nodes, newNode] });
+        const { workflow, workflowStatus } = get();
+        set({
+          nodes: [...get().nodes, newNode],
+          workflowStatus: workflow ? "modified" : workflowStatus,
+        });
+        get().saveDraft();
       },
 
       updateNodeConfig: (nodeId, config) => {
@@ -327,8 +371,10 @@ export const useWorkflowStore = create<WorkflowState>()(
           nodes: workflow.nodes as WorkflowNode[],
           edges: workflow.edges,
           selectedNode: null,
+          workflowStatus: "saved",
           history: [],
           historyIndex: -1,
+          draftWorkflow: null,
         });
       },
 
@@ -355,10 +401,20 @@ export const useWorkflowStore = create<WorkflowState>()(
 
         if (workflow) {
           const updated = await api.workflows.update(workflow.id, data);
-          set({ workflow: updated, currentWorkflowId: updated.id });
+          set({
+            workflow: updated,
+            currentWorkflowId: updated.id,
+            workflowStatus: "saved",
+            draftWorkflow: null,
+          });
         } else {
           const created = await api.workflows.create(data);
-          set({ workflow: created, currentWorkflowId: created.id });
+          set({
+            workflow: created,
+            currentWorkflowId: created.id,
+            workflowStatus: "saved",
+            draftWorkflow: null,
+          });
         }
       },
 
@@ -390,7 +446,23 @@ export const useWorkflowStore = create<WorkflowState>()(
             set({ workflow: tempWorkflow, currentWorkflowId: tempWorkflow.id });
           }
 
-          const execution = await api.workflows.execute(workflowId, input);
+          // Send current nodes/edges to ensure we use the latest state, not the saved version
+          const execution = await api.workflows.execute(workflowId, {
+            input,
+            nodes: nodes.map((n) => ({
+              id: n.id,
+              type: n.type as "input" | "api" | "ai" | "logic" | "output" | "webhook",
+              position: n.position,
+              data: n.data,
+            })),
+            edges: edges.map((e) => ({
+              id: e.id,
+              source: e.source,
+              target: e.target,
+              sourceHandle: e.sourceHandle ?? undefined,
+              targetHandle: e.targetHandle ?? undefined,
+            })),
+          });
           set({
             lastExecution: execution,
             executionLogs: execution.logs || [],
@@ -420,10 +492,12 @@ export const useWorkflowStore = create<WorkflowState>()(
           selectedNode: null,
           workflow: null,
           currentWorkflowId: null,
+          workflowStatus: "draft",
           executionLogs: [],
           lastExecution: null,
           history: [],
           historyIndex: -1,
+          draftWorkflow: null,
         });
       },
 
@@ -455,12 +529,55 @@ export const useWorkflowStore = create<WorkflowState>()(
         });
       },
 
+      saveDraft: () => {
+        const { nodes, edges, workflow } = get();
+        // Only save draft if there are nodes and it's not a saved workflow
+        if (nodes.length > 0 && !workflow) {
+          set({
+            draftWorkflow: {
+              nodes: JSON.parse(JSON.stringify(nodes)),
+              edges: JSON.parse(JSON.stringify(edges)),
+              lastModified: new Date().toISOString(),
+            },
+          });
+        }
+      },
+
+      loadDraft: () => {
+        const { draftWorkflow } = get();
+        if (draftWorkflow && draftWorkflow.nodes.length > 0) {
+          set({
+            nodes: draftWorkflow.nodes,
+            edges: draftWorkflow.edges,
+            workflowStatus: "draft",
+            workflow: null,
+            currentWorkflowId: null,
+          });
+          return true;
+        }
+        return false;
+      },
+
+      clearDraft: () => {
+        set({ draftWorkflow: null });
+      },
+
+      hasDraft: () => {
+        const { draftWorkflow } = get();
+        return !!(draftWorkflow && draftWorkflow.nodes.length > 0);
+      },
+
+      getWorkflowStatus: () => {
+        return get().workflowStatus;
+      },
+
       hydrateFromStorage: async () => {
-        const { currentWorkflowId, isHydrated } = get();
+        const { currentWorkflowId, draftWorkflow, isHydrated } = get();
         if (isHydrated) return;
 
         set({ isHydrated: true });
 
+        // Priority: Load saved workflow if exists, otherwise load draft
         if (currentWorkflowId) {
           try {
             const workflow = await api.workflows.get(currentWorkflowId);
@@ -468,11 +585,26 @@ export const useWorkflowStore = create<WorkflowState>()(
               workflow,
               nodes: workflow.nodes as WorkflowNode[],
               edges: workflow.edges,
+              workflowStatus: "saved",
             });
-          } catch (error) {
-            // Workflow might have been deleted, clear the stored ID
+          } catch {
+            // Workflow might have been deleted, try loading draft
             set({ currentWorkflowId: null });
+            if (draftWorkflow && draftWorkflow.nodes.length > 0) {
+              set({
+                nodes: draftWorkflow.nodes,
+                edges: draftWorkflow.edges,
+                workflowStatus: "draft",
+              });
+            }
           }
+        } else if (draftWorkflow && draftWorkflow.nodes.length > 0) {
+          // No saved workflow, load draft if exists
+          set({
+            nodes: draftWorkflow.nodes,
+            edges: draftWorkflow.edges,
+            workflowStatus: "draft",
+          });
         }
       },
     }),
@@ -480,6 +612,7 @@ export const useWorkflowStore = create<WorkflowState>()(
       name: "flowys-workflow-storage",
       partialize: (state) => ({
         currentWorkflowId: state.currentWorkflowId,
+        draftWorkflow: state.draftWorkflow,
       }),
     }
   )

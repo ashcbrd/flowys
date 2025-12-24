@@ -16,6 +16,7 @@ import {
   BookOpen,
   FolderOpen,
   Clock,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,18 +35,21 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { useWorkflowStore } from "@/store/workflow";
+import { useWorkflowStore, type WorkflowStatus } from "@/store/workflow";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import { WorkflowsDialog } from "./WorkflowsDialog";
 import { IntegrationsPanel } from "./IntegrationsPanel";
 import { VersionsModal } from "./VersionsModal";
 import { ExecutionHistory } from "./ExecutionHistory";
+import { SchedulesPanel } from "./SchedulesPanel";
 
 export function Header() {
   const router = useRouter();
   const {
     workflow,
     currentWorkflowId,
+    workflowStatus,
     isExecuting,
     executeWorkflow,
     saveWorkflow,
@@ -58,12 +62,53 @@ export function Header() {
     canRedo,
   } = useWorkflowStore();
   const { toast } = useToast();
+
+  const getStatusBadge = (status: WorkflowStatus) => {
+    switch (status) {
+      case "draft":
+        return (
+          <Badge variant="secondary" className="text-xs">
+            Draft
+          </Badge>
+        );
+      case "saved":
+        return (
+          <Badge variant="outline" className="text-xs text-green-600 border-green-600">
+            Saved
+          </Badge>
+        );
+      case "modified":
+        return (
+          <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-600">
+            Modified
+          </Badge>
+        );
+    }
+  };
+
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSecs < 60) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [integrationsOpen, setIntegrationsOpen] = useState(false);
   const [workflowsOpen, setWorkflowsOpen] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
   const [executionHistoryOpen, setExecutionHistoryOpen] = useState(false);
+  const [schedulesOpen, setSchedulesOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState(workflow?.name || "");
   const [runInput, setRunInput] = useState("{}");
 
@@ -134,9 +179,17 @@ export function Header() {
         <header className="h-14 border-b bg-card flex items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold text-primary">Flowys</h1>
-          <span className="text-sm text-muted-foreground">
-            {workflow?.name || "Untitled Workflow"}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {workflow?.name || "Untitled Workflow"}
+            </span>
+            {getStatusBadge(workflowStatus)}
+            {workflow?.updatedAt && (
+              <span className="text-xs text-muted-foreground/70" title={new Date(workflow.updatedAt).toLocaleString()}>
+                · Modified {formatRelativeTime(workflow.updatedAt)}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {/* Undo/Redo buttons */}
@@ -271,13 +324,17 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => { newWorkflow(); router.push("/workflow"); }}>
+              <DropdownMenuItem onClick={() => { newWorkflow(); router.replace("/workflow"); }}>
                 <FilePlus className="h-4 w-4" />
                 New Workflow
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setWorkflowsOpen(true)}>
                 <FolderOpen className="h-4 w-4" />
                 Workflows
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSchedulesOpen(true)}>
+                <Calendar className="h-4 w-4" />
+                Scheduled Runs
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setIntegrationsOpen(true)}>
@@ -327,6 +384,14 @@ export function Header() {
           onVersionRestored={() => loadWorkflow(currentWorkflowId)}
         />
       )}
+
+      {/* Schedules Panel */}
+      <SchedulesPanel
+        open={schedulesOpen}
+        onOpenChange={setSchedulesOpen}
+        workflowId={currentWorkflowId || undefined}
+        workflowName={workflow?.name}
+      />
     </>
   );
 }
