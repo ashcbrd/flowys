@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase, Workflow, WorkflowVersion } from "@/lib/db";
+import { getAuthenticatedUser, verifyWorkflowOwnership } from "@/lib/auth-helpers";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
 // GET /api/workflows/[id]/versions - List all versions of a workflow
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id } = await params;
 
-    // Verify workflow exists
-    const workflow = await Workflow.findById(id);
+    // Verify workflow exists and user owns it
+    const workflow = await verifyWorkflowOwnership(id, user.id);
     if (!workflow) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }
@@ -47,11 +53,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // POST /api/workflows/[id]/versions - Create a new version (snapshot)
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id } = await params;
 
-    // Get the current workflow
-    const workflow = await Workflow.findById(id).lean();
+    // Get the current workflow and verify ownership
+    const workflow = await verifyWorkflowOwnership(id, user.id);
     if (!workflow) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }

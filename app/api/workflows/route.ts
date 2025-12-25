@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid";
 import { z } from "zod";
 import { connectToDatabase, Workflow, type NodeData, type EdgeData } from "@/lib/db";
 import { validateNodeConfig } from "@/lib/nodes";
+import { getAuthenticatedUser } from "@/lib/auth-helpers";
 
 const NodeSchema = z.object({
   id: z.string(),
@@ -34,8 +35,15 @@ const WorkflowSchema = z.object({
 
 export async function GET() {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
-    const workflows = await Workflow.find().sort({ createdAt: -1 }).lean();
+    const workflows = await Workflow.find({ userId: user.id })
+      .sort({ createdAt: -1 })
+      .lean();
 
     return NextResponse.json(
       workflows.map((w) => ({
@@ -59,6 +67,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
 
     const body = await request.json();
@@ -90,6 +103,7 @@ export async function POST(request: NextRequest) {
 
     const workflow = await Workflow.create({
       _id: id,
+      userId: user.id,
       name,
       description: description || null,
       nodes: nodes as NodeData[],

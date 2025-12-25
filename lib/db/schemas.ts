@@ -32,6 +32,7 @@ export interface ExecutionLog {
 
 export interface IWorkflow {
   _id: string;
+  userId: string;
   name: string;
   description?: string;
   nodes: NodeData[];
@@ -122,6 +123,7 @@ const ExecutionLogSchema = new Schema<ExecutionLog>(
 const WorkflowSchema = new Schema<IWorkflow>(
   {
     _id: { type: String, required: true },
+    userId: { type: String, required: true, index: true },
     name: { type: String, required: true, maxlength: 100 },
     description: { type: String, maxlength: 500 },
     nodes: { type: [NodeDataSchema], required: true, default: [] },
@@ -182,6 +184,7 @@ const PromptVersionSchema = new Schema<IPromptVersion>(
 );
 
 WorkflowSchema.index({ createdAt: -1 });
+WorkflowSchema.index({ userId: 1, createdAt: -1 });
 ExecutionSchema.index({ workflowId: 1, createdAt: -1 });
 ExecutionSchema.index({ createdAt: -1 });
 PromptVersionSchema.index({ workflowId: 1, nodeId: 1, version: -1 });

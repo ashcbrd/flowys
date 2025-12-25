@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectToDatabase, Workflow, WorkflowVersion } from "@/lib/db";
+import { getAuthenticatedUser, verifyWorkflowOwnership } from "@/lib/auth-helpers";
 
 type RouteParams = { params: Promise<{ id: string; versionId: string }> };
 
 // GET /api/workflows/[id]/versions/[versionId] - Get a specific version
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id, versionId } = await params;
 
-    // Verify workflow exists
-    const workflow = await Workflow.findById(id);
+    // Verify workflow exists and user owns it
+    const workflow = await verifyWorkflowOwnership(id, user.id);
     if (!workflow) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }
@@ -62,11 +68,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // POST /api/workflows/[id]/versions/[versionId] - Restore a version
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id, versionId } = await params;
 
-    // Verify workflow exists
-    const workflow = await Workflow.findById(id);
+    // Verify workflow exists and user owns it
+    const workflow = await verifyWorkflowOwnership(id, user.id);
     if (!workflow) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }
@@ -149,11 +160,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/workflows/[id]/versions/[versionId] - Delete a version
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id, versionId } = await params;
 
-    // Verify workflow exists
-    const workflow = await Workflow.findById(id);
+    // Verify workflow exists and user owns it
+    const workflow = await verifyWorkflowOwnership(id, user.id);
     if (!workflow) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }

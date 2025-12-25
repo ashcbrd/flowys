@@ -1,18 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase, Workflow } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
+import { getAuthenticatedUser, verifyWorkflowOwnership } from "@/lib/auth-helpers";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
 // POST /api/workflows/[id]/duplicate - Duplicate a workflow
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id } = await params;
 
-    // Find the original workflow
-    const original = await Workflow.findById(id).lean();
-
+    // Find the original workflow and verify ownership
+    const original = await verifyWorkflowOwnership(id, user.id);
     if (!original) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }
@@ -32,6 +37,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const newWorkflowId = uuidv4();
     const duplicated = await Workflow.create({
       _id: newWorkflowId,
+      userId: user.id,
       name: newName,
       description: original.description,
       nodes: original.nodes.map((node) => ({

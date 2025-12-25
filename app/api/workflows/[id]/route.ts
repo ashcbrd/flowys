@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { connectToDatabase, Workflow, type NodeData, type EdgeData } from "@/lib/db";
 import { validateNodeConfig } from "@/lib/nodes";
+import { getAuthenticatedUser, verifyWorkflowOwnership } from "@/lib/auth-helpers";
 
 const NodeSchema = z.object({
   id: z.string(),
@@ -35,11 +36,15 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id } = await params;
 
-    const workflow = await Workflow.findById(id).lean();
-
+    const workflow = await verifyWorkflowOwnership(id, user.id);
     if (!workflow) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }
@@ -64,11 +69,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id } = await params;
 
-    const existing = await Workflow.findById(id);
-
+    const existing = await verifyWorkflowOwnership(id, user.id);
     if (!existing) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }
@@ -129,11 +138,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id } = await params;
 
-    const existing = await Workflow.findById(id);
-
+    const existing = await verifyWorkflowOwnership(id, user.id);
     if (!existing) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }

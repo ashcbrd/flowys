@@ -2,16 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuid } from "uuid";
 import { connectToDatabase, Workflow, Execution } from "@/lib/db";
 import { createExecutor } from "@/lib/engine";
+import { getAuthenticatedUser, verifyWorkflowOwnership } from "@/lib/auth-helpers";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectToDatabase();
     const { id } = await params;
 
-    const workflow = await Workflow.findById(id).lean();
-
+    const workflow = await verifyWorkflowOwnership(id, user.id);
     if (!workflow) {
       return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
     }
