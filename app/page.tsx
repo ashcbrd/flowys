@@ -40,7 +40,7 @@ function PixelBackground() {
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {/* Grid pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
         style={{
           backgroundImage: `
             linear-gradient(to right, #3b82f6 1px, transparent 1px),
@@ -53,7 +53,7 @@ function PixelBackground() {
       {pixels.map((pixel) => (
         <div
           key={pixel.id}
-          className="absolute w-2 h-2 bg-blue-400/20 rounded-sm animate-pulse"
+          className="absolute w-2 h-2 bg-blue-400/20 dark:bg-blue-400/30 rounded-sm animate-pulse"
           style={{
             left: `${pixel.x}%`,
             top: `${pixel.y}%`,
@@ -63,9 +63,9 @@ function PixelBackground() {
         />
       ))}
       {/* Floating gradient orbs */}
-      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-blob" />
-      <div className="absolute top-40 right-20 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
-      <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-indigo-400/10 rounded-full blur-3xl animate-blob animation-delay-4000" />
+      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-400/10 dark:bg-blue-400/20 rounded-full blur-3xl animate-blob" />
+      <div className="absolute top-40 right-20 w-96 h-96 bg-sky-400/10 dark:bg-sky-400/20 rounded-full blur-3xl animate-blob animation-delay-2000" />
+      <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-indigo-400/10 dark:bg-indigo-400/20 rounded-full blur-3xl animate-blob animation-delay-4000" />
     </div>
   );
 }
@@ -128,27 +128,27 @@ function AnimatedConnection({ delay = 0 }: { delay?: number }) {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">Flowys</span>
+            <span className="text-xl font-bold text-foreground">Flowys</span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Features
             </Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
               Pricing
             </Link>
-            <Link href="/tutorial" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/tutorial" className="text-muted-foreground hover:text-foreground transition-colors">
               Tutorial
             </Link>
-            <Link href="/docs" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/docs" className="text-muted-foreground hover:text-foreground transition-colors">
               Docs
             </Link>
           </div>
@@ -168,21 +168,21 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-blue-50/50 to-white relative overflow-hidden">
+      <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/30 dark:to-background relative overflow-hidden">
         <PixelBackground />
         <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-full text-blue-700 dark:text-blue-300 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
             Simple automation for everyone
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
             Build powerful workflows
             <br />
             <span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
               without the complexity
             </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed">
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
             Connect your favorite tools, automate repetitive tasks, and let AI do the heavy lifting.
             No coding required. Simple pricing, powerful results.
           </p>
@@ -198,7 +198,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/tutorial"
-              className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-gray-50 border border-gray-200 text-gray-900 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-sm"
+              className="w-full sm:w-auto px-8 py-4 bg-background hover:bg-muted border border-border text-foreground font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-sm"
             >
               <Play className="w-5 h-5" />
               How it works
@@ -208,13 +208,13 @@ export default function LandingPage() {
 
         {/* Animated Visual Preview */}
         <div className="max-w-6xl mx-auto mt-16 relative z-10">
-          <div className="relative rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-2 shadow-2xl shadow-blue-500/10">
+          <div className="relative rounded-2xl border border-border bg-background/80 backdrop-blur-sm p-2 shadow-2xl shadow-blue-500/10">
             {/* Glowing border effect */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-sky-500 rounded-2xl opacity-20 blur-sm" />
-            <div className="relative rounded-xl bg-gradient-to-br from-slate-50 to-blue-50/50 p-8 min-h-[400px] flex items-center justify-center overflow-hidden">
+            <div className="relative rounded-xl bg-gradient-to-br from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950/50 p-8 min-h-[400px] flex items-center justify-center overflow-hidden">
               {/* Inner grid pattern */}
               <div
-                className="absolute inset-0 opacity-[0.02]"
+                className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
                 style={{
                   backgroundImage: `
                     linear-gradient(to right, #3b82f6 1px, transparent 1px),
@@ -227,8 +227,8 @@ export default function LandingPage() {
                 {/* Sample workflow nodes with animations */}
                 <div className="flex flex-col items-center">
                   <AnimatedNode delay={200}>
-                    <div className="px-6 py-4 bg-white border-2 border-emerald-200 rounded-xl text-emerald-700 font-medium flex items-center gap-3 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 hover:scale-105 transition-all duration-300 cursor-default">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                    <div className="px-6 py-4 bg-background border-2 border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-700 dark:text-emerald-300 font-medium flex items-center gap-3 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 hover:scale-105 transition-all duration-300 cursor-default">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
                         <Webhook className="w-5 h-5" />
                       </div>
                       <span>Webhook Trigger</span>
@@ -237,8 +237,8 @@ export default function LandingPage() {
                   </AnimatedNode>
                   <AnimatedConnection delay={500} />
                   <AnimatedNode delay={800}>
-                    <div className="px-6 py-4 bg-white border-2 border-blue-200 rounded-xl text-blue-700 font-medium flex items-center gap-3 shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 hover:scale-105 transition-all duration-300 cursor-default">
-                      <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <div className="px-6 py-4 bg-background border-2 border-blue-200 dark:border-blue-800 rounded-xl text-blue-700 dark:text-blue-300 font-medium flex items-center gap-3 shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 hover:scale-105 transition-all duration-300 cursor-default">
+                      <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
                         <Bot className="w-5 h-5" />
                       </div>
                       <span>AI Process</span>
@@ -251,8 +251,8 @@ export default function LandingPage() {
                   </AnimatedNode>
                   <AnimatedConnection delay={1100} />
                   <AnimatedNode delay={1400}>
-                    <div className="px-6 py-4 bg-white border-2 border-amber-200 rounded-xl text-amber-700 font-medium flex items-center gap-3 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 hover:scale-105 transition-all duration-300 cursor-default">
-                      <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <div className="px-6 py-4 bg-background border-2 border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-300 font-medium flex items-center gap-3 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 hover:scale-105 transition-all duration-300 cursor-default">
+                      <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
                         <Code className="w-5 h-5" />
                       </div>
                       <span>Transform Data</span>
@@ -286,34 +286,34 @@ export default function LandingPage() {
       </section>
 
       {/* Value Props */}
-      <section className="py-20 px-6 border-y border-gray-100">
+      <section className="py-20 px-6 border-y border-border">
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
           <div className="text-center">
-            <div className="w-16 h-16 bg-emerald-100 border border-emerald-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Puzzle className="w-8 h-8 text-emerald-600" />
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Puzzle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Drag. Drop. Done.</h3>
-            <p className="text-gray-600 leading-relaxed">
+            <h3 className="text-xl font-semibold text-foreground mb-3">Drag. Drop. Done.</h3>
+            <p className="text-muted-foreground leading-relaxed">
               Build complex automations visually. If you can draw a flowchart, you can build a workflow.
               Zero learning curve.
             </p>
           </div>
           <div className="text-center">
-            <div className="w-16 h-16 bg-blue-100 border border-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Workflow className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Workflow className="w-8 h-8 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Infinitely Flexible</h3>
-            <p className="text-gray-600 leading-relaxed">
+            <h3 className="text-xl font-semibold text-foreground mb-3">Infinitely Flexible</h3>
+            <p className="text-muted-foreground leading-relaxed">
               From simple notifications to complex AI pipelines. Conditions, loops, API calls, webhooks -
               build anything you imagine.
             </p>
           </div>
           <div className="text-center">
-            <div className="w-16 h-16 bg-amber-100 border border-amber-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <DollarSign className="w-8 h-8 text-amber-600" />
+            <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <DollarSign className="w-8 h-8 text-amber-600 dark:text-amber-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Affordable Pricing</h3>
-            <p className="text-gray-600 leading-relaxed">
+            <h3 className="text-xl font-semibold text-foreground mb-3">Affordable Pricing</h3>
+            <p className="text-muted-foreground leading-relaxed">
               No hidden fees, no per-seat pricing. Simple, transparent pricing that scales with your needs.
               Pay only for what you use.
             </p>
@@ -325,10 +325,10 @@ export default function LandingPage() {
       <section id="features" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               Everything you need to automate
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Powerful features that make automation accessible to everyone,
               from beginners to power users.
             </p>
@@ -375,41 +375,41 @@ export default function LandingPage() {
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="p-6 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-200"
+                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-200"
               >
                 <div
                   className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
                     feature.color === "blue"
-                      ? "bg-blue-100 border border-blue-200"
+                      ? "bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800"
                       : feature.color === "emerald"
-                      ? "bg-emerald-100 border border-emerald-200"
+                      ? "bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800"
                       : feature.color === "sky"
-                      ? "bg-sky-100 border border-sky-200"
+                      ? "bg-sky-100 dark:bg-sky-900/50 border border-sky-200 dark:border-sky-800"
                       : feature.color === "amber"
-                      ? "bg-amber-100 border border-amber-200"
+                      ? "bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800"
                       : feature.color === "rose"
-                      ? "bg-rose-100 border border-rose-200"
-                      : "bg-indigo-100 border border-indigo-200"
+                      ? "bg-rose-100 dark:bg-rose-900/50 border border-rose-200 dark:border-rose-800"
+                      : "bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800"
                   }`}
                 >
                   <feature.icon
                     className={`w-6 h-6 ${
                       feature.color === "blue"
-                        ? "text-blue-600"
+                        ? "text-blue-600 dark:text-blue-400"
                         : feature.color === "emerald"
-                        ? "text-emerald-600"
+                        ? "text-emerald-600 dark:text-emerald-400"
                         : feature.color === "sky"
-                        ? "text-sky-600"
+                        ? "text-sky-600 dark:text-sky-400"
                         : feature.color === "amber"
-                        ? "text-amber-600"
+                        ? "text-amber-600 dark:text-amber-400"
                         : feature.color === "rose"
-                        ? "text-rose-600"
-                        : "text-indigo-600"
+                        ? "text-rose-600 dark:text-rose-400"
+                        : "text-indigo-600 dark:text-indigo-400"
                     }`}
                   />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -417,13 +417,13 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-24 px-6 bg-gray-50 border-y border-gray-100">
+      <section className="py-24 px-6 bg-muted/50 border-y border-border">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               From idea to automation in minutes
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-muted-foreground">
               Three simple steps. No engineering degree required.
             </p>
           </div>
@@ -434,8 +434,8 @@ export default function LandingPage() {
                 1
               </div>
               <div className="pt-8 pl-4">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Choose your trigger</h3>
-                <p className="text-gray-600 leading-relaxed">
+                <h3 className="text-xl font-semibold text-foreground mb-3">Choose your trigger</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Start with a webhook, schedule, or manual trigger. This is what kicks off your automation.
                 </p>
               </div>
@@ -445,8 +445,8 @@ export default function LandingPage() {
                 2
               </div>
               <div className="pt-8 pl-4">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Add your logic</h3>
-                <p className="text-gray-600 leading-relaxed">
+                <h3 className="text-xl font-semibold text-foreground mb-3">Add your logic</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Drag nodes onto the canvas. Connect them together. Add conditions, AI, transformations - whatever you need.
                 </p>
               </div>
@@ -456,8 +456,8 @@ export default function LandingPage() {
                 3
               </div>
               <div className="pt-8 pl-4">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Run and relax</h3>
-                <p className="text-gray-600 leading-relaxed">
+                <h3 className="text-xl font-semibold text-foreground mb-3">Run and relax</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Hit run. Watch it work. Your workflow handles the rest while you focus on what matters.
                 </p>
               </div>
@@ -470,43 +470,43 @@ export default function LandingPage() {
       <section id="pricing" className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               Simple, credit-based pricing
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Pay for what you use. Credits refresh monthly. Unused credits roll over.
             </p>
           </div>
 
           {/* Credits explainer */}
-          <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-12 max-w-3xl mx-auto">
-            <h4 className="font-semibold text-gray-900 mb-3">How credits work:</h4>
+          <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900 rounded-xl p-6 mb-12 max-w-3xl mx-auto">
+            <h4 className="font-semibold text-foreground mb-3">How credits work:</h4>
             <div className="grid sm:grid-cols-3 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-gray-600">Basic nodes: <strong className="text-gray-900">1 credit</strong></span>
+                <span className="text-muted-foreground">Basic nodes: <strong className="text-foreground">1 credit</strong></span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500" />
-                <span className="text-gray-600">AI nodes: <strong className="text-gray-900">10 credits</strong></span>
+                <span className="text-muted-foreground">AI nodes: <strong className="text-foreground">10 credits</strong></span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-amber-500" />
-                <span className="text-gray-600">Webhooks: <strong className="text-gray-900">1 credit</strong></span>
+                <span className="text-muted-foreground">Webhooks: <strong className="text-foreground">1 credit</strong></span>
               </div>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Starter Tier */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
-              <h3 className="text-lg font-medium text-gray-500 mb-2">Starter</h3>
+            <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
+              <h3 className="text-lg font-medium text-muted-foreground mb-2">Starter</h3>
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-bold text-gray-900">$9</span>
-                <span className="text-gray-500">/month</span>
+                <span className="text-5xl font-bold text-foreground">$9</span>
+                <span className="text-muted-foreground">/month</span>
               </div>
-              <p className="text-blue-600 font-medium mb-6">500 credits/month</p>
-              <p className="text-gray-600 mb-8">Perfect for personal projects.</p>
+              <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">500 credits/month</p>
+              <p className="text-muted-foreground mb-8">Perfect for personal projects.</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Unlimited workflows",
@@ -514,8 +514,8 @@ export default function LandingPage() {
                   "Webhook triggers",
                   "Community support",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <Check className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <li key={item} className="flex items-center gap-3 text-foreground">
+                    <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -524,24 +524,24 @@ export default function LandingPage() {
                 href="/workflow"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full py-3 text-center bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-xl transition-colors"
+                className="block w-full py-3 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors"
               >
                 Get Started
               </Link>
             </div>
 
             {/* Pro Tier */}
-            <div className="rounded-2xl border-2 border-blue-500 bg-white p-8 relative shadow-xl shadow-blue-500/10">
+            <div className="rounded-2xl border-2 border-blue-500 bg-card p-8 relative shadow-xl shadow-blue-500/10">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
                 Most Popular
               </div>
-              <h3 className="text-lg font-medium text-gray-500 mb-2">Pro</h3>
+              <h3 className="text-lg font-medium text-muted-foreground mb-2">Pro</h3>
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-bold text-gray-900">$29</span>
-                <span className="text-gray-500">/month</span>
+                <span className="text-5xl font-bold text-foreground">$29</span>
+                <span className="text-muted-foreground">/month</span>
               </div>
-              <p className="text-blue-600 font-medium mb-6">2,500 credits/month</p>
-              <p className="text-gray-600 mb-8">For growing teams and businesses.</p>
+              <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">2,500 credits/month</p>
+              <p className="text-muted-foreground mb-8">For growing teams and businesses.</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Everything in Starter",
@@ -550,8 +550,8 @@ export default function LandingPage() {
                   "Priority support",
                   "Credit rollover",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <Check className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                  <li key={item} className="flex items-center gap-3 text-foreground">
+                    <Check className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -567,14 +567,14 @@ export default function LandingPage() {
             </div>
 
             {/* Business Tier */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
-              <h3 className="text-lg font-medium text-gray-500 mb-2">Business</h3>
+            <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
+              <h3 className="text-lg font-medium text-muted-foreground mb-2">Business</h3>
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-bold text-gray-900">$79</span>
-                <span className="text-gray-500">/month</span>
+                <span className="text-5xl font-bold text-foreground">$79</span>
+                <span className="text-muted-foreground">/month</span>
               </div>
-              <p className="text-blue-600 font-medium mb-6">10,000 credits/month</p>
-              <p className="text-gray-600 mb-8">For scaling organizations.</p>
+              <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">10,000 credits/month</p>
+              <p className="text-muted-foreground mb-8">For scaling organizations.</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Everything in Pro",
@@ -583,8 +583,8 @@ export default function LandingPage() {
                   "Custom integrations",
                   "Dedicated support",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <Check className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <li key={item} className="flex items-center gap-3 text-foreground">
+                    <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -593,7 +593,7 @@ export default function LandingPage() {
                 href="/workflow"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full py-3 text-center bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-xl transition-colors"
+                className="block w-full py-3 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors"
               >
                 Get Started
               </Link>
@@ -602,9 +602,9 @@ export default function LandingPage() {
 
           {/* Enterprise callout */}
           <div className="mt-12 text-center">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Need more credits or custom features?{" "}
-              <button className="text-blue-600 font-medium hover:underline">
+              <button className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
                 Contact us for Enterprise pricing
               </button>
             </p>
@@ -636,26 +636,26 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-gray-100 bg-white">
+      <footer className="py-12 px-6 border-t border-border bg-background">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-gray-900">Flowys</span>
+            <span className="text-lg font-bold text-foreground">Flowys</span>
           </div>
-          <div className="flex items-center gap-8 text-sm text-gray-600">
-            <Link href="/docs" className="hover:text-gray-900 transition-colors">
+          <div className="flex items-center gap-8 text-sm text-muted-foreground">
+            <Link href="/docs" className="hover:text-foreground transition-colors">
               Documentation
             </Link>
-            <Link href="/privacy" className="hover:text-gray-900 transition-colors">
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-gray-900 transition-colors">
+            <Link href="/terms" className="hover:text-foreground transition-colors">
               Terms
             </Link>
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Flowys. All rights reserved.
           </p>
         </div>
