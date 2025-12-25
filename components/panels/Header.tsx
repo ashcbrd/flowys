@@ -273,7 +273,7 @@ export function Header() {
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          {/* Beautify - only show when nodes are connected */}
+          {/* Auto Layout - only show when nodes are connected */}
           {hasConnectedNodes() && (
             <Button
               variant="outline"
@@ -283,7 +283,7 @@ export function Header() {
               title="Auto-arrange nodes"
             >
               <Wand2 className="h-3.5 w-3.5" />
-              Beautify
+              Auto Layout
             </Button>
           )}
 
