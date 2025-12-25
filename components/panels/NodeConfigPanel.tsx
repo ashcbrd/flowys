@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { X, Trash2, Plus, GripVertical } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Trash2, Plus, GripVertical, Loader2, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,6 +66,12 @@ export function NodeConfigPanel() {
         )}
         {selectedNode.type === "output" && (
           <OutputNodeConfig config={config} onChange={handleConfigChange} />
+        )}
+        {selectedNode.type === "integration" && (
+          <IntegrationNodeConfig config={config} onChange={handleConfigChange} />
+        )}
+        {selectedNode.type === "webhook" && (
+          <WebhookNodeConfig config={config} onChange={handleConfigChange} />
         )}
 
         <div className="pt-4 border-t">
@@ -742,6 +749,430 @@ function OutputNodeConfig({ config, onChange }: ConfigProps) {
           </p>
         </div>
       )}
+    </div>
+  );
+}
+
+interface Connection {
+  _id: string;
+  integrationId: string;
+  name: string;
+  enabled: boolean;
+  integration?: {
+    id: string;
+    name: string;
+    icon: string;
+  };
+}
+
+interface IntegrationAction {
+  id: string;
+  name: string;
+  description: string;
+  inputSchema?: Record<string, {
+    type: string;
+    description?: string;
+    required?: boolean;
+    default?: unknown;
+  }>;
+}
+
+interface IntegrationDefinition {
+  config: {
+    id: string;
+    name: string;
+    icon: string;
+  };
+  actions: IntegrationAction[];
+}
+
+function IntegrationNodeConfig({ config, onChange }: ConfigProps) {
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [integrations, setIntegrations] = useState<IntegrationDefinition[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null);
+  const [selectedIntegration, setSelectedIntegration] = useState<IntegrationDefinition | null>(null);
+
+  const connectionId = config.connectionId as string | undefined;
+  const actionId = config.actionId as string | undefined;
+  const inputConfig = (config.input as Record<string, unknown>) || {};
+
+  // Fetch connections and integrations on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [connectionsRes, integrationsRes] = await Promise.all([
+          fetch("/api/connections"),
+          fetch("/api/integrations"),
+        ]);
+
+        const connectionsData = await connectionsRes.json();
+        const integrationsData = await integrationsRes.json();
+
+        setConnections(connectionsData.connections || []);
+        setIntegrations(integrationsData.integrations || []);
+      } catch (error) {
+        console.error("Failed to fetch integration data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Update selected connection/integration when data loads or config changes
+  useEffect(() => {
+    if (connectionId && connections.length > 0) {
+      const conn = connections.find((c) => c._id === connectionId);
+      setSelectedConnection(conn || null);
+
+      if (conn && integrations.length > 0) {
+        const integ = integrations.find((i) => i.config.id === conn.integrationId);
+        setSelectedIntegration(integ || null);
+      }
+    }
+  }, [connectionId, connections, integrations]);
+
+  const handleConnectionChange = (connId: string) => {
+    const conn = connections.find((c) => c._id === connId);
+    setSelectedConnection(conn || null);
+
+    if (conn) {
+      const integ = integrations.find((i) => i.config.id === conn.integrationId);
+      setSelectedIntegration(integ || null);
+
+      onChange("connectionId", connId);
+      onChange("connectionName", conn.name);
+      onChange("integrationId", conn.integrationId);
+      onChange("integrationName", integ?.config.name || conn.integrationId);
+      // Reset action when connection changes
+      onChange("actionId", "");
+      onChange("actionName", "");
+      onChange("input", {});
+    }
+  };
+
+  const handleActionChange = (actId: string) => {
+    const action = selectedIntegration?.actions.find((a) => a.id === actId);
+    onChange("actionId", actId);
+    onChange("actionName", action?.name || actId);
+    // Reset input when action changes
+    onChange("input", {});
+  };
+
+  const handleInputChange = (key: string, value: unknown) => {
+    onChange("input", { ...inputConfig, [key]: value });
+  };
+
+  const selectedAction = selectedIntegration?.actions.find((a) => a.id === actionId);
+  const enabledConnections = connections.filter((c) => c.enabled);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (enabledConnections.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-6 border rounded-lg border-dashed">
+          <p className="text-sm text-muted-foreground mb-3">
+            No connections available. Connect an app first.
+          </p>
+          <Button size="sm" asChild>
+            <Link href="/integrations">
+              <ExternalLink className="h-4 w-4 mr-1" />
+              Go to Integrations
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label>Connection</Label>
+        <Select value={connectionId || ""} onValueChange={handleConnectionChange}>
+          <SelectTrigger className="mt-1">
+            <SelectValue placeholder="Select a connection" />
+          </SelectTrigger>
+          <SelectContent>
+            {enabledConnections.map((conn) => (
+              <SelectItem key={conn._id} value={conn._id}>
+                <div className="flex items-center gap-2">
+                  {conn.integration?.icon && (
+                    <img
+                      src={conn.integration.icon}
+                      alt=""
+                      className="h-4 w-4"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  )}
+                  {conn.name}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground mt-1">
+          <Link href="/integrations" className="text-primary hover:underline">
+            Manage connections
+          </Link>
+        </p>
+      </div>
+
+      {selectedConnection && selectedIntegration && (
+        <div>
+          <Label>Action</Label>
+          <Select value={actionId || ""} onValueChange={handleActionChange}>
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="Select an action" />
+            </SelectTrigger>
+            <SelectContent>
+              {selectedIntegration.actions.map((action) => (
+                <SelectItem key={action.id} value={action.id}>
+                  {action.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {selectedAction && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {selectedAction.description}
+            </p>
+          )}
+        </div>
+      )}
+
+      {selectedAction?.inputSchema && Object.keys(selectedAction.inputSchema).length > 0 && (
+        <div className="space-y-3">
+          <Label>Action Inputs</Label>
+          {Object.entries(selectedAction.inputSchema).map(([key, schema]) => (
+            <div key={key} className="space-y-1">
+              <Label className="text-xs font-normal">
+                {key}
+                {schema.required && <span className="text-destructive ml-1">*</span>}
+              </Label>
+              {schema.type === "string" && (
+                <Input
+                  value={(inputConfig[key] as string) || ""}
+                  onChange={(e) => handleInputChange(key, e.target.value)}
+                  placeholder={schema.description || `Enter ${key}`}
+                  className="h-8"
+                />
+              )}
+              {schema.type === "number" && (
+                <Input
+                  type="number"
+                  value={(inputConfig[key] as number) ?? ""}
+                  onChange={(e) => handleInputChange(key, parseFloat(e.target.value) || 0)}
+                  placeholder={schema.description || `Enter ${key}`}
+                  className="h-8"
+                />
+              )}
+              {schema.type === "boolean" && (
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={(inputConfig[key] as boolean) ?? false}
+                    onCheckedChange={(checked) => handleInputChange(key, checked)}
+                  />
+                  <span className="text-xs text-muted-foreground">{schema.description}</span>
+                </div>
+              )}
+              {(schema.type === "array" || schema.type === "object") && (
+                <Textarea
+                  value={
+                    inputConfig[key]
+                      ? JSON.stringify(inputConfig[key], null, 2)
+                      : ""
+                  }
+                  onChange={(e) => {
+                    try {
+                      const parsed = e.target.value ? JSON.parse(e.target.value) : undefined;
+                      handleInputChange(key, parsed);
+                    } catch {
+                      // Allow invalid JSON while typing
+                    }
+                  }}
+                  placeholder={schema.description || `Enter ${key} as JSON`}
+                  className="font-mono text-xs"
+                  rows={3}
+                />
+              )}
+              {schema.description && schema.type !== "boolean" && (
+                <p className="text-xs text-muted-foreground">{schema.description}</p>
+              )}
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground">
+            Use {"{{variableName}}"} for dynamic values from previous nodes
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WebhookNodeConfig({ config, onChange }: ConfigProps) {
+  const headers = config.headers as Record<string, string> | undefined;
+  const headersList: { key: string; value: string }[] = headers
+    ? Object.entries(headers).map(([key, value]) => ({ key, value }))
+    : [];
+
+  const updateHeaders = (newList: { key: string; value: string }[]) => {
+    const newHeaders: Record<string, string> = {};
+    newList.forEach((h) => {
+      if (h.key.trim()) {
+        newHeaders[h.key] = h.value;
+      }
+    });
+    onChange("headers", newHeaders);
+  };
+
+  const addHeader = () => {
+    updateHeaders([...headersList, { key: "", value: "" }]);
+  };
+
+  const updateHeader = (index: number, updates: Partial<{ key: string; value: string }>) => {
+    const newList = headersList.map((h, i) => (i === index ? { ...h, ...updates } : h));
+    updateHeaders(newList);
+  };
+
+  const removeHeader = (index: number) => {
+    updateHeaders(headersList.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label>Webhook URL</Label>
+        <Input
+          value={(config.url as string) || ""}
+          onChange={(e) => onChange("url", e.target.value)}
+          placeholder="https://example.com/webhook"
+          className="mt-1"
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Use {"{{variableName}}"} for dynamic values
+        </p>
+      </div>
+
+      <div>
+        <Label>Method</Label>
+        <Select
+          value={(config.method as string) || "POST"}
+          onValueChange={(v) => onChange("method", v)}
+        >
+          <SelectTrigger className="mt-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="GET">GET</SelectItem>
+            <SelectItem value="POST">POST</SelectItem>
+            <SelectItem value="PUT">PUT</SelectItem>
+            <SelectItem value="PATCH">PATCH</SelectItem>
+            <SelectItem value="DELETE">DELETE</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <Label>Headers</Label>
+          <Button size="sm" variant="outline" onClick={addHeader}>
+            <Plus className="h-3 w-3 mr-1" />
+            Add
+          </Button>
+        </div>
+
+        {headersList.length === 0 && (
+          <p className="text-xs text-muted-foreground py-2 text-center border rounded border-dashed">
+            No custom headers
+          </p>
+        )}
+
+        <div className="space-y-2">
+          {headersList.map((header, i) => (
+            <div key={i} className="flex gap-2">
+              <Input
+                value={header.key}
+                onChange={(e) => updateHeader(i, { key: e.target.value })}
+                placeholder="Header"
+                className="h-8 flex-1"
+              />
+              <Input
+                value={header.value}
+                onChange={(e) => updateHeader(i, { value: e.target.value })}
+                placeholder="Value"
+                className="h-8 flex-1"
+              />
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => removeHeader(i)}
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <Label>Payload Template</Label>
+        <Textarea
+          value={
+            config.payloadTemplate
+              ? JSON.stringify(config.payloadTemplate, null, 2)
+              : ""
+          }
+          onChange={(e) => {
+            try {
+              const parsed = e.target.value ? JSON.parse(e.target.value) : undefined;
+              onChange("payloadTemplate", parsed);
+            } catch {
+              // Allow invalid JSON while typing
+            }
+          }}
+          placeholder='{"data": "{{inputValue}}"}'
+          className="mt-1 font-mono text-sm"
+          rows={4}
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          JSON payload to send. Use {"{{variableName}}"} for dynamic values.
+        </p>
+      </div>
+
+      <div>
+        <Label>Timeout (ms)</Label>
+        <Input
+          type="number"
+          value={(config.timeout as number) ?? 30000}
+          onChange={(e) => onChange("timeout", parseInt(e.target.value) || 30000)}
+          className="mt-1"
+        />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Switch
+          id="continueOnError"
+          checked={(config.continueOnError as boolean) ?? false}
+          onCheckedChange={(checked) => onChange("continueOnError", checked)}
+        />
+        <Label htmlFor="continueOnError" className="text-sm font-normal">
+          Continue workflow on error
+        </Label>
+      </div>
     </div>
   );
 }

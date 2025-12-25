@@ -20,11 +20,12 @@ import {
   Filter,
   FileOutput,
   Globe,
+  Plug,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type DocSection = "getting-started" | "nodes" | "api" | "webhooks";
+type DocSection = "getting-started" | "nodes" | "integrations" | "api" | "webhooks";
 
 export default function DocsPage() {
   const [activeSection, setActiveSection] = useState<DocSection>("getting-started");
@@ -65,6 +66,12 @@ export default function DocsPage() {
               onClick={() => setActiveSection("nodes")}
             />
             <SidebarItem
+              icon={Plug}
+              label="Integrations"
+              active={activeSection === "integrations"}
+              onClick={() => setActiveSection("integrations")}
+            />
+            <SidebarItem
               icon={Key}
               label="API Reference"
               active={activeSection === "api"}
@@ -83,6 +90,7 @@ export default function DocsPage() {
         <main className="flex-1 p-8 max-w-4xl">
           {activeSection === "getting-started" && <GettingStartedDocs />}
           {activeSection === "nodes" && <NodeTypesDocs />}
+          {activeSection === "integrations" && <IntegrationsDocs />}
           {activeSection === "api" && <ApiDocs />}
           {activeSection === "webhooks" && <WebhookDocs />}
         </main>
@@ -305,6 +313,251 @@ function NodeTypesDocs() {
           whenToUse="When you need to notify other systems, send data to external services, or trigger actions in third-party apps."
           example="Send a Slack notification, update a Google Sheet, trigger a Zapier workflow, or post to a custom API endpoint."
         />
+
+        <NodeDocCard
+          icon={Plug}
+          name="Integration"
+          color="bg-purple-600"
+          description="Connect to third-party apps like Slack, GitHub, Google Sheets, and more using pre-built integrations."
+          whenToUse="When you want to interact with popular apps without manually configuring API calls. Integrations handle authentication and provide easy-to-use actions."
+          example="Send a Slack message, create a GitHub issue, add a row to Google Sheets, or create a Notion page - all with a few clicks."
+        />
+      </div>
+    </div>
+  );
+}
+
+function IntegrationsDocs() {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold mb-2">App Integrations</h1>
+        <p className="text-lg text-muted-foreground">
+          Connect your workflows to popular third-party services with pre-built integrations.
+        </p>
+      </div>
+
+      {/* Overview */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Overview</h2>
+        <p className="text-muted-foreground leading-relaxed">
+          Integrations allow you to connect Flowys to external apps like Slack, GitHub, Google Sheets,
+          and more. Instead of manually configuring API calls, integrations provide:
+        </p>
+        <div className="bg-muted/50 rounded-lg p-4 border">
+          <ul className="space-y-2 text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span><strong>Secure authentication</strong> - OAuth2 or API key based, with encrypted credential storage</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span><strong>Pre-built actions</strong> - Common operations ready to use (send message, create issue, etc.)</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span><strong>No code required</strong> - Just select the action and fill in the inputs</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      {/* Available Integrations */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Available Integrations</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <IntegrationCard
+            name="Slack"
+            authType="OAuth2"
+            actions={["Send Message", "Create Channel", "List Channels", "Upload File"]}
+          />
+          <IntegrationCard
+            name="GitHub"
+            authType="OAuth2"
+            actions={["Create Issue", "Create PR", "List Repos", "Get/Update Files"]}
+          />
+          <IntegrationCard
+            name="Google Sheets"
+            authType="OAuth2"
+            actions={["Read Range", "Write Range", "Append Rows", "Create Spreadsheet"]}
+          />
+          <IntegrationCard
+            name="Notion"
+            authType="OAuth2"
+            actions={["Create Page", "Query Database", "Add Item", "Search"]}
+          />
+          <IntegrationCard
+            name="Discord"
+            authType="OAuth2"
+            actions={["Send Message", "Create Channel", "List Guilds", "Add Reaction"]}
+          />
+          <IntegrationCard
+            name="Airtable"
+            authType="API Key"
+            actions={["List Records", "Create Record", "Update Record"]}
+          />
+          <IntegrationCard
+            name="OpenAI"
+            authType="API Key"
+            actions={["Chat Completion", "Generate Image", "Embeddings", "Transcribe"]}
+          />
+          <IntegrationCard
+            name="SendGrid"
+            authType="API Key"
+            actions={["Send Email", "Bulk Email", "Add Contact", "Get Stats"]}
+          />
+          <IntegrationCard
+            name="Twilio"
+            authType="Basic Auth"
+            actions={["Send SMS", "Make Call", "WhatsApp", "Phone Lookup"]}
+          />
+          <IntegrationCard
+            name="Stripe"
+            authType="API Key"
+            actions={["Create Customer", "Payment Intent", "Subscription", "Refund"]}
+          />
+        </div>
+      </section>
+
+      {/* Setting Up */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-semibold">Setting Up an Integration</h2>
+
+        <div className="space-y-6">
+          <StepCard
+            number={1}
+            title="Go to Integrations Page"
+            description="Click on the hamburger menu in the header and select 'App Integrations', or navigate directly to /integrations."
+          />
+
+          <StepCard
+            number={2}
+            title="Choose an Integration"
+            description="Browse available integrations and click 'Connect' on the one you want to use."
+          />
+
+          <StepCard
+            number={3}
+            title="Authenticate"
+            description="For OAuth2 integrations, you'll be redirected to authorize access. For API key integrations, paste your key from the service's dashboard."
+          />
+
+          <StepCard
+            number={4}
+            title="Name Your Connection"
+            description="Give your connection a descriptive name like 'Production Slack' or 'Personal GitHub' so you can identify it later."
+          />
+        </div>
+      </section>
+
+      {/* Using in Workflows */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Using Integrations in Workflows</h2>
+        <p className="text-muted-foreground">
+          Once you've connected an integration, you can use it in your workflows:
+        </p>
+
+        <div className="space-y-4">
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold mb-2">1. Add an Integration Node</h3>
+            <p className="text-sm text-muted-foreground">
+              Drag the "Integration" node from the sidebar onto your canvas.
+            </p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold mb-2">2. Select Your Connection</h3>
+            <p className="text-sm text-muted-foreground">
+              In the node configuration panel, choose which connected account to use.
+            </p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold mb-2">3. Choose an Action</h3>
+            <p className="text-sm text-muted-foreground">
+              Select what you want to do (e.g., "Send Message" for Slack).
+            </p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold mb-2">4. Configure Inputs</h3>
+            <p className="text-sm text-muted-foreground">
+              Fill in the required fields. Use {"{{variableName}}"} to inject dynamic values from previous nodes.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Example */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Example: AI Summary to Slack</h2>
+        <p className="text-muted-foreground">
+          Here's a workflow that summarizes text using AI and posts it to Slack:
+        </p>
+        <div className="bg-muted/50 rounded-lg p-4 border font-mono text-sm">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="bg-blue-500 text-white px-2 py-1 rounded">Input</span>
+            <ArrowRight className="h-4 w-4" />
+            <span className="bg-purple-500 text-white px-2 py-1 rounded">AI (Summarize)</span>
+            <ArrowRight className="h-4 w-4" />
+            <span className="bg-purple-600 text-white px-2 py-1 rounded">Integration (Slack)</span>
+            <ArrowRight className="h-4 w-4" />
+            <span className="bg-red-500 text-white px-2 py-1 rounded">Output</span>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          The Integration node sends the AI's summary to a Slack channel using your connected Slack account.
+        </p>
+      </section>
+
+      {/* Security */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Security</h2>
+        <p className="text-muted-foreground">
+          Your integration credentials are protected with enterprise-grade security:
+        </p>
+        <div className="bg-muted/50 rounded-lg p-4 border">
+          <ul className="space-y-2 text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span><strong>AES-256 encryption</strong> - All credentials are encrypted at rest</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span><strong>OAuth2 tokens</strong> - We never store your passwords, only secure tokens</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span><strong>Revoke anytime</strong> - Disconnect integrations instantly from your dashboard</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function IntegrationCard({
+  name,
+  authType,
+  actions,
+}: {
+  name: string;
+  authType: string;
+  actions: string[];
+}) {
+  return (
+    <div className="border rounded-lg p-4">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-semibold">{name}</h3>
+        <span className="text-xs bg-muted px-2 py-1 rounded">{authType}</span>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {actions.map((action) => (
+          <span key={action} className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
+            {action}
+          </span>
+        ))}
       </div>
     </div>
   );

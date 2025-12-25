@@ -23,6 +23,7 @@ interface DropdownMenuItemProps {
   onClick?: () => void;
   disabled?: boolean;
   className?: string;
+  asChild?: boolean;
 }
 
 interface DropdownMenuSeparatorProps {
@@ -106,26 +107,35 @@ export function DropdownMenuContent({ children, align = "end", className }: Drop
   );
 }
 
-export function DropdownMenuItem({ children, onClick, disabled, className }: DropdownMenuItemProps) {
+export function DropdownMenuItem({ children, onClick, disabled, className, asChild }: DropdownMenuItemProps) {
   const { setOpen } = React.useContext(DropdownMenuContext);
 
   const handleClick = () => {
-    if (!disabled && onClick) {
-      onClick();
+    if (!disabled) {
+      onClick?.();
       setOpen(false);
     }
   };
+
+  const itemClassName = cn(
+    "w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-muted transition-colors",
+    disabled && "opacity-50 cursor-not-allowed",
+    className
+  );
+
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement<{ onClick?: () => void; className?: string }>, {
+      onClick: handleClick,
+      className: cn((children as React.ReactElement<{ className?: string }>).props.className, itemClassName),
+    });
+  }
 
   return (
     <button
       type="button"
       onClick={handleClick}
       disabled={disabled}
-      className={cn(
-        "w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-muted transition-colors",
-        disabled && "opacity-50 cursor-not-allowed",
-        className
-      )}
+      className={itemClassName}
     >
       {children}
     </button>
