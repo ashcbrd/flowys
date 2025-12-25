@@ -1,4 +1,4 @@
-export type NodeType = "input" | "api" | "ai" | "logic" | "output" | "webhook";
+export type NodeType = "input" | "api" | "ai" | "logic" | "output" | "webhook" | "integration";
 
 export interface NodeContext {
   nodeId: string;
@@ -72,4 +72,14 @@ export interface WebhookNodeConfig {
   secret?: string;
   timeout?: number;
   continueOnError?: boolean;
+}
+
+export interface IntegrationNodeConfig {
+  connectionId: string;
+  connectionName?: string;
+  integrationId: string;
+  integrationName?: string;
+  actionId: string;
+  actionName?: string;
+  input: Record<string, unknown>;
 }

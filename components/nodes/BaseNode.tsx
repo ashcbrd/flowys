@@ -77,5 +77,15 @@ function getNodeDescription(config: Record<string, unknown>): string {
   if (config.fields && Array.isArray(config.fields)) {
     return `${config.fields.length} field(s)`;
   }
+  // Integration node description
+  if (config.integrationId && config.actionId) {
+    return `${config.integrationName || config.integrationId}: ${config.actionName || config.actionId}`;
+  }
+  if (config.integrationId) {
+    return config.integrationName as string || config.integrationId as string;
+  }
+  if (config.connectionId) {
+    return config.connectionName as string || "Connected";
+  }
   return "Click to configure";
 }

@@ -17,6 +17,7 @@ import {
   FolderOpen,
   Clock,
   Calendar,
+  Plug,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,6 @@ import { useWorkflowStore, type WorkflowStatus } from "@/store/workflow";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { WorkflowsDialog } from "./WorkflowsDialog";
-import { IntegrationsPanel } from "./IntegrationsPanel";
 import { VersionsModal } from "./VersionsModal";
 import { ExecutionHistory } from "./ExecutionHistory";
 import { SchedulesPanel } from "./SchedulesPanel";
@@ -104,7 +104,6 @@ export function Header() {
   };
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [runDialogOpen, setRunDialogOpen] = useState(false);
-  const [integrationsOpen, setIntegrationsOpen] = useState(false);
   const [workflowsOpen, setWorkflowsOpen] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
   const [executionHistoryOpen, setExecutionHistoryOpen] = useState(false);
@@ -337,17 +336,25 @@ export function Header() {
                 Scheduled Runs
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setIntegrationsOpen(true)}>
-                <Settings className="h-4 w-4" />
-                Integrations
+              <DropdownMenuItem asChild>
+                <Link href="/integrations">
+                  <Plug className="h-4 w-4" />
+                  App Integrations
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings">
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href="/docs" target="_blank">
-                <DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/docs" target="_blank">
                   <BookOpen className="h-4 w-4" />
                   Documentation
-                </DropdownMenuItem>
-              </Link>
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -367,12 +374,6 @@ export function Header() {
 
       {/* Workflows Dialog */}
       <WorkflowsDialog open={workflowsOpen} onOpenChange={setWorkflowsOpen} />
-
-      {/* Integrations Panel */}
-      <IntegrationsPanel
-        open={integrationsOpen}
-        onOpenChange={setIntegrationsOpen}
-      />
 
       {/* Version History Modal */}
       {currentWorkflowId && (

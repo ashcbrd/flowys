@@ -16,6 +16,7 @@ import { ApiNode } from "@/components/nodes/ApiNode";
 import { AiNode } from "@/components/nodes/AiNode";
 import { LogicNode } from "@/components/nodes/LogicNode";
 import { OutputNode } from "@/components/nodes/OutputNode";
+import { IntegrationNode } from "@/components/nodes/IntegrationNode";
 
 const nodeTypes = {
   input: InputNode,
@@ -23,6 +24,7 @@ const nodeTypes = {
   ai: AiNode,
   logic: LogicNode,
   output: OutputNode,
+  integration: IntegrationNode,
 };
 
 export function WorkflowCanvas() {
@@ -75,7 +77,7 @@ export function WorkflowCanvas() {
         y: event.clientY - bounds.top - 25,
       };
 
-      addNode(type as "input" | "api" | "ai" | "logic" | "output", position);
+      addNode(type as "input" | "api" | "ai" | "logic" | "output" | "integration", position);
     },
     [addNode]
   );

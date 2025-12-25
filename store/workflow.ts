@@ -4,7 +4,7 @@ import type { Node, Edge, Connection, NodeChange, EdgeChange } from "@xyflow/rea
 import { applyNodeChanges, applyEdgeChanges, addEdge } from "@xyflow/react";
 import { api, type Workflow, type Execution, type ExecutionLog } from "@/lib/api";
 
-export type NodeType = "input" | "api" | "ai" | "logic" | "output" | "webhook";
+export type NodeType = "input" | "api" | "ai" | "logic" | "output" | "webhook" | "integration";
 
 export interface WorkflowNode extends Node {
   type: NodeType;
@@ -141,6 +141,15 @@ const defaultConfigs: Record<NodeType, Record<string, unknown>> = {
     timeout: 30000,
     continueOnError: false,
   },
+  integration: {
+    connectionId: "",
+    connectionName: "",
+    integrationId: "",
+    integrationName: "",
+    actionId: "",
+    actionName: "",
+    input: {},
+  },
 };
 
 const nodeLabels: Record<NodeType, string> = {
@@ -150,6 +159,7 @@ const nodeLabels: Record<NodeType, string> = {
   logic: "Logic",
   output: "Output",
   webhook: "Webhook",
+  integration: "Integration",
 };
 
 export const useWorkflowStore = create<WorkflowState>()(
@@ -386,7 +396,7 @@ export const useWorkflowStore = create<WorkflowState>()(
           description,
           nodes: nodes.map((n) => ({
             id: n.id,
-            type: n.type as "input" | "api" | "ai" | "logic" | "output",
+            type: n.type as NodeType,
             position: n.position,
             data: n.data,
           })),
@@ -430,7 +440,7 @@ export const useWorkflowStore = create<WorkflowState>()(
               name: "Untitled Workflow",
               nodes: nodes.map((n) => ({
                 id: n.id,
-                type: n.type as "input" | "api" | "ai" | "logic" | "output",
+                type: n.type as NodeType,
                 position: n.position,
                 data: n.data,
               })),
@@ -451,7 +461,7 @@ export const useWorkflowStore = create<WorkflowState>()(
             input,
             nodes: nodes.map((n) => ({
               id: n.id,
-              type: n.type as "input" | "api" | "ai" | "logic" | "output" | "webhook",
+              type: n.type as NodeType,
               position: n.position,
               data: n.data,
             })),

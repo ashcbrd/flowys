@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FileInput, Globe, Sparkles, GitBranch, FileOutput, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileInput, Globe, Sparkles, GitBranch, FileOutput, ChevronLeft, ChevronRight, Plug } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -40,6 +40,13 @@ const nodeTypes = [
     description: "Return final result",
     icon: FileOutput,
     color: "bg-red-600",
+  },
+  {
+    type: "integration",
+    label: "Integration",
+    description: "Connect third-party apps",
+    icon: Plug,
+    color: "bg-violet-600",
   },
 ];
 

@@ -45,3 +45,10 @@ export {
   frequencyToCron,
   getNextRunTime,
 } from "./models/Schedule";
+
+export {
+  Connection,
+  type IConnection,
+  encryptCredentials,
+  decryptCredentials,
+} from "./models/Connection";
