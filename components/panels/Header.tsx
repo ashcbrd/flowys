@@ -311,6 +311,34 @@ export function Header() {
             </Button>
           </div>
 
+          {/* Clear Canvas */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={clearCanvas}
+            title="Clear Canvas"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+
+          {/* Save Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 h-8"
+            onClick={handleQuickSave}
+            disabled={isSaving}
+            title="Save Workflow"
+          >
+            {isSaving ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}
+            {isSaving ? "Saving..." : "Save"}
+          </Button>
+
           {/* Run Button - Primary action */}
           <Button
             onClick={() => setRunDialogOpen(true)}
@@ -378,10 +406,6 @@ export function Header() {
               <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
                 Workflow
               </div>
-              <DropdownMenuItem onClick={handleQuickSave} disabled={isSaving}>
-                <Save className="h-4 w-4" />
-                {isSaving ? "Saving..." : "Save"}
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => { newWorkflow(); router.replace("/workflow"); }}>
                 <FilePlus className="h-4 w-4" />
                 New Workflow
@@ -396,10 +420,6 @@ export function Header() {
                   Version History
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={clearCanvas}>
-                <Trash2 className="h-4 w-4" />
-                Clear Canvas
-              </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 

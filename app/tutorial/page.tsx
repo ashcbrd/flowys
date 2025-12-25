@@ -26,43 +26,43 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   {
     id: "welcome",
-    title: "Welcome to Flowys!",
-    subtitle: "Let's learn how to build your first workflow",
+    title: "Let's build something",
+    subtitle: "Your first AI workflow in under 3 minutes",
   },
   {
     id: "add-node",
-    title: "Adding Nodes",
-    subtitle: "Drag nodes from the dock to the canvas",
+    title: "Drag your first node",
+    subtitle: "Everything starts with an input",
   },
   {
     id: "configure-input",
-    title: "Configure Input Node",
-    subtitle: "Set up what data your workflow needs",
+    title: "Define your input",
+    subtitle: "Tell the workflow what data to expect",
   },
   {
     id: "connect-nodes",
-    title: "Connecting Nodes",
-    subtitle: "Link nodes together to create a flow",
+    title: "Connect the dots",
+    subtitle: "Data flows from left to right",
   },
   {
     id: "configure-ai",
-    title: "Configure AI Node",
-    subtitle: "Tell the AI what to do with your data",
+    title: "Add the AI magic",
+    subtitle: "One prompt. Endless possibilities.",
   },
   {
     id: "add-output",
-    title: "Add Output Node",
-    subtitle: "Define the final result of your workflow",
+    title: "Capture the result",
+    subtitle: "Every workflow needs an output",
   },
   {
     id: "run-workflow",
-    title: "Run Your Workflow",
-    subtitle: "Execute and see the results",
+    title: "Hit run",
+    subtitle: "Watch your workflow come alive",
   },
   {
     id: "complete",
-    title: "You're Ready!",
-    subtitle: "Start building your own workflows",
+    title: "You're a builder now",
+    subtitle: "Go make something great",
   },
 ];
 
@@ -118,7 +118,7 @@ export default function TutorialPage() {
             <ThemeToggle />
             <Button variant="outline" asChild>
               <Link href="/workflow">
-                Skip Tutorial
+                Skip to Editor
                 <X className="h-4 w-4 ml-1" />
               </Link>
             </Button>
@@ -197,7 +197,7 @@ export default function TutorialPage() {
           ) : (
             <Button asChild className="gap-2 bg-gradient-to-r from-blue-500 to-indigo-600">
               <Link href="/workflow">
-                Start Building
+                Open Editor
                 <Rocket className="h-4 w-4" />
               </Link>
             </Button>
@@ -452,10 +452,10 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
       <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-8 shadow-xl animate-pulse">
         <Zap className="h-12 w-12 text-white" />
       </div>
-      <h2 className="text-2xl font-bold mb-4">Build Powerful Workflows Visually</h2>
+      <h2 className="text-2xl font-bold mb-4">See how easy this is</h2>
       <p className="text-muted-foreground max-w-md mb-8">
-        In this tutorial, you'll learn how to create a simple AI-powered workflow
-        that takes text input, processes it with AI, and returns the result.
+        We'll build a text summarizer together. You'll drag 3 nodes,
+        connect them, and run your first AI workflow. Ready?
       </p>
       <div className="flex flex-col items-center gap-4">
         <div className="flex items-center gap-8 text-sm text-muted-foreground">
@@ -481,7 +481,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
           </div>
         </div>
         <Button onClick={onNext} size="lg" className="mt-4 gap-2 bg-gradient-to-r from-blue-500 to-indigo-600">
-          Let's Start
+          Let's Go
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
@@ -1151,10 +1151,10 @@ function CompleteStep({ showConfetti }: { showConfetti: boolean }) {
         <Check className="h-12 w-12 text-white" />
       </div>
 
-      <h2 className="text-3xl font-bold mb-4">Congratulations!</h2>
+      <h2 className="text-3xl font-bold mb-4">That's it. Seriously.</h2>
       <p className="text-muted-foreground max-w-md mb-8">
-        You've learned the basics of building workflows in Flowys.
-        Now you're ready to create your own powerful automations!
+        You just built an AI workflow. No code. No config files.
+        Now imagine what you could automate for real.
       </p>
 
       <div className="grid grid-cols-3 gap-4 mb-8 text-sm">
@@ -1162,29 +1162,29 @@ function CompleteStep({ showConfetti }: { showConfetti: boolean }) {
           <div className="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center text-white mx-auto mb-2">
             <FileInput className="h-5 w-5" />
           </div>
-          <p className="font-medium">Add Nodes</p>
-          <p className="text-xs text-muted-foreground">Drag from dock</p>
+          <p className="font-medium">Drag</p>
+          <p className="text-xs text-muted-foreground">Pick your nodes</p>
         </div>
         <div className="p-4 rounded-xl bg-muted/50 border">
           <div className="w-10 h-10 rounded-lg bg-violet-500 flex items-center justify-center text-white mx-auto mb-2">
             <Settings className="h-5 w-5" />
           </div>
           <p className="font-medium">Configure</p>
-          <p className="text-xs text-muted-foreground">Click to setup</p>
+          <p className="text-xs text-muted-foreground">Set your logic</p>
         </div>
         <div className="p-4 rounded-xl bg-muted/50 border">
           <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center text-white mx-auto mb-2">
             <Play className="h-5 w-5" />
           </div>
           <p className="font-medium">Run</p>
-          <p className="text-xs text-muted-foreground">Execute workflow</p>
+          <p className="text-xs text-muted-foreground">Ship it</p>
         </div>
       </div>
 
       <Button asChild size="lg" className="gap-2 bg-gradient-to-r from-blue-500 to-indigo-600">
         <Link href="/workflow">
           <Rocket className="h-5 w-5" />
-          Start Building
+          Build Your First Workflow
         </Link>
       </Button>
     </div>

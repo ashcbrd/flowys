@@ -96,21 +96,21 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-full text-blue-700 dark:text-blue-300 text-sm font-medium">
               <Sparkles className="w-4 h-4" />
-              Welcome back
+              One click to start
             </div>
           </div>
 
           {/* Heading */}
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
-              Sign in to
+              Welcome to
               <br />
               <span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
                 Flowys
               </span>
             </h1>
             <p className="text-lg text-muted-foreground">
-              Continue building powerful workflows
+              Sign in to pick up where you left off
             </p>
           </div>
 
@@ -170,7 +170,7 @@ export default function LoginPage() {
                     <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Your data is encrypted and secure. We never share your information.
+                    Enterprise-grade encryption. Your workflows and data stay private.
                   </p>
                 </div>
 

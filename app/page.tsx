@@ -160,7 +160,7 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center gap-2 shadow-md shadow-blue-500/20"
             >
-              Open Editor
+              Try It Now
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -173,18 +173,18 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-full text-blue-700 dark:text-blue-300 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
-            Simple automation for everyone
+            Visual AI workflow builder
           </div>
           <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
-            Build powerful workflows
+            Stop writing scripts.
             <br />
             <span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
-              without the complexity
+              Start building workflows.
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-            Connect your favorite tools, automate repetitive tasks, and let AI do the heavy lifting.
-            No coding required. Simple pricing, powerful results.
+            Turn hours of manual work into minutes. Drag, drop, and connect AI-powered nodes
+            to automate anything—no code, no complexity, no learning curve.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -201,7 +201,7 @@ export default function LandingPage() {
               className="w-full sm:w-auto px-8 py-4 bg-background hover:bg-muted border border-border text-foreground font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-sm"
             >
               <Play className="w-5 h-5" />
-              How it works
+              Try the Tutorial
             </Link>
           </div>
         </div>
@@ -292,30 +292,27 @@ export default function LandingPage() {
             <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Puzzle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-3">Drag. Drop. Done.</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-3">Build in minutes, not days</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Build complex automations visually. If you can draw a flowchart, you can build a workflow.
-              Zero learning curve.
+              If you can draw a flowchart, you can build a workflow. No tutorials needed—just drag, connect, and run.
             </p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Workflow className="w-8 h-8 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-3">Infinitely Flexible</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-3">AI that actually works</h3>
             <p className="text-muted-foreground leading-relaxed">
-              From simple notifications to complex AI pipelines. Conditions, loops, API calls, webhooks -
-              build anything you imagine.
+              Summarize documents, extract data, generate content, or make decisions. Add AI to any step with one click.
             </p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <DollarSign className="w-8 h-8 text-amber-600 dark:text-amber-400" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-3">Affordable Pricing</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-3">Pay for results, not seats</h3>
             <p className="text-muted-foreground leading-relaxed">
-              No hidden fees, no per-seat pricing. Simple, transparent pricing that scales with your needs.
-              Pay only for what you use.
+              No per-user fees. No hidden costs. Simple credit-based pricing—start free, scale as you grow.
             </p>
           </div>
         </div>
@@ -326,11 +323,11 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Everything you need to automate
+              Every tool you need. None you don't.
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Powerful features that make automation accessible to everyone,
-              from beginners to power users.
+              Built for makers who ship fast. Simple enough for your first workflow,
+              powerful enough for production.
             </p>
           </div>
 
@@ -339,37 +336,37 @@ export default function LandingPage() {
               {
                 icon: Bot,
                 title: "AI-Powered Nodes",
-                description: "Let AI generate content, analyze data, or make decisions right inside your workflows.",
+                description: "GPT-4, Claude, or your own models. Summarize, analyze, generate, or decide—all in one node.",
                 color: "blue",
               },
               {
                 icon: Webhook,
                 title: "Webhooks & APIs",
-                description: "Connect with any service. Trigger workflows from external events or push data anywhere.",
+                description: "Trigger workflows from Stripe, GitHub, or any webhook. Push results to Slack, email, or your database.",
                 color: "emerald",
               },
               {
                 icon: GitBranch,
                 title: "Conditional Logic",
-                description: "Branch your workflows based on conditions. Handle every scenario automatically.",
+                description: "If-then branching that actually makes sense. Route data based on any condition you define.",
                 color: "sky",
               },
               {
                 icon: Clock,
                 title: "Scheduled Runs",
-                description: "Run workflows on a schedule. Daily reports, weekly cleanups, hourly checks - you decide.",
+                description: "Set it and forget it. Daily reports at 9am, hourly syncs, or monthly cleanups—your schedule.",
                 color: "amber",
               },
               {
                 icon: Shield,
                 title: "Secure by Default",
-                description: "API keys, signatures, and scopes. Your data stays safe with enterprise-grade security.",
+                description: "Your credentials stay encrypted. Scoped API keys, webhook signatures, and audit logs included.",
                 color: "rose",
               },
               {
                 icon: Users,
-                title: "Team Collaboration",
-                description: "Share workflows with your team. Build together, deploy together.",
+                title: "Built for Teams",
+                description: "Share workflows across your team. Version history keeps everyone on the same page.",
                 color: "indigo",
               },
             ].map((feature) => (
@@ -421,10 +418,10 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              From idea to automation in minutes
+              Build once. Run forever.
             </h2>
             <p className="text-xl text-muted-foreground">
-              Three simple steps. No engineering degree required.
+              Go from idea to working automation in under 5 minutes.
             </p>
           </div>
 
@@ -434,9 +431,9 @@ export default function LandingPage() {
                 1
               </div>
               <div className="pt-8 pl-4">
-                <h3 className="text-xl font-semibold text-foreground mb-3">Choose your trigger</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-3">Pick a trigger</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Start with a webhook, schedule, or manual trigger. This is what kicks off your automation.
+                  Webhook hits your endpoint? New Stripe payment? Scheduled time? Choose what starts your workflow.
                 </p>
               </div>
             </div>
@@ -445,9 +442,9 @@ export default function LandingPage() {
                 2
               </div>
               <div className="pt-8 pl-4">
-                <h3 className="text-xl font-semibold text-foreground mb-3">Add your logic</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-3">Connect your steps</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Drag nodes onto the canvas. Connect them together. Add conditions, AI, transformations - whatever you need.
+                  Drag an AI node. Add a condition. Call an API. Connect them visually—see your logic take shape.
                 </p>
               </div>
             </div>
@@ -456,9 +453,9 @@ export default function LandingPage() {
                 3
               </div>
               <div className="pt-8 pl-4">
-                <h3 className="text-xl font-semibold text-foreground mb-3">Run and relax</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-3">Hit run. Walk away.</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Hit run. Watch it work. Your workflow handles the rest while you focus on what matters.
+                  Your workflow runs automatically. Check the logs anytime, or just trust it's handling business.
                 </p>
               </div>
             </div>
@@ -471,28 +468,28 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Simple, credit-based pricing
+              Predictable pricing. No surprises.
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Pay for what you use. Credits refresh monthly. Unused credits roll over.
+              Credits refresh monthly. Unused credits roll over. Cancel anytime.
             </p>
           </div>
 
           {/* Credits explainer */}
           <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900 rounded-xl p-6 mb-12 max-w-3xl mx-auto">
-            <h4 className="font-semibold text-foreground mb-3">How credits work:</h4>
+            <h4 className="font-semibold text-foreground mb-3">Quick credit math:</h4>
             <div className="grid sm:grid-cols-3 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-muted-foreground">Basic nodes: <strong className="text-foreground">1 credit</strong></span>
+                <span className="text-muted-foreground">Logic & transforms: <strong className="text-foreground">1 credit</strong></span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500" />
-                <span className="text-muted-foreground">AI nodes: <strong className="text-foreground">10 credits</strong></span>
+                <span className="text-muted-foreground">AI processing: <strong className="text-foreground">10 credits</strong></span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-amber-500" />
-                <span className="text-muted-foreground">Webhooks: <strong className="text-foreground">1 credit</strong></span>
+                <span className="text-muted-foreground">Webhook triggers: <strong className="text-foreground">1 credit</strong></span>
               </div>
             </div>
           </div>
@@ -506,7 +503,7 @@ export default function LandingPage() {
                 <span className="text-muted-foreground">/month</span>
               </div>
               <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">500 credits/month</p>
-              <p className="text-muted-foreground mb-8">Perfect for personal projects.</p>
+              <p className="text-muted-foreground mb-8">For personal projects and testing ideas.</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Unlimited workflows",
@@ -526,7 +523,7 @@ export default function LandingPage() {
                 rel="noopener noreferrer"
                 className="block w-full py-3 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors"
               >
-                Get Started
+                Choose Starter
               </Link>
             </div>
 
@@ -541,7 +538,7 @@ export default function LandingPage() {
                 <span className="text-muted-foreground">/month</span>
               </div>
               <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">2,500 credits/month</p>
-              <p className="text-muted-foreground mb-8">For growing teams and businesses.</p>
+              <p className="text-muted-foreground mb-8">For serious automation. Most teams start here.</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Everything in Starter",
@@ -562,7 +559,7 @@ export default function LandingPage() {
                 rel="noopener noreferrer"
                 className="block w-full py-3 text-center bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all shadow-md"
               >
-                Get Started
+                Choose Pro
               </Link>
             </div>
 
@@ -574,7 +571,7 @@ export default function LandingPage() {
                 <span className="text-muted-foreground">/month</span>
               </div>
               <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">10,000 credits/month</p>
-              <p className="text-muted-foreground mb-8">For scaling organizations.</p>
+              <p className="text-muted-foreground mb-8">For teams running workflows at scale.</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Everything in Pro",
@@ -595,7 +592,7 @@ export default function LandingPage() {
                 rel="noopener noreferrer"
                 className="block w-full py-3 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors"
               >
-                Get Started
+                Contact Sales
               </Link>
             </div>
           </div>
@@ -603,9 +600,9 @@ export default function LandingPage() {
           {/* Enterprise callout */}
           <div className="mt-12 text-center">
             <p className="text-muted-foreground">
-              Need more credits or custom features?{" "}
+              Need 50,000+ credits or custom integrations?{" "}
               <button className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
-                Contact us for Enterprise pricing
+                Let's talk Enterprise
               </button>
             </p>
           </div>
@@ -616,11 +613,10 @@ export default function LandingPage() {
       <section className="py-24 px-6 bg-gradient-to-br from-blue-600 to-blue-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to automate?
+            Your first automation is 5 minutes away
           </h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Join teams who stopped doing repetitive tasks manually.
-            Your first workflow is just a few clicks away.
+            No credit card required. No sales calls. Just drag, drop, and ship.
           </p>
           <Link
             href="/workflow"
@@ -629,7 +625,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-3 px-10 py-5 bg-white hover:bg-gray-50 text-blue-700 font-semibold rounded-xl transition-all duration-200 text-lg shadow-lg"
           >
             <Zap className="w-6 h-6" />
-            Start Building Now
+            Start Building
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
