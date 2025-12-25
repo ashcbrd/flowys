@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Play,
   Save,
   Trash2,
-  Settings,
   Undo2,
   Redo2,
   FilePlus,
@@ -18,6 +17,13 @@ import {
   Clock,
   Calendar,
   Plug,
+  Settings,
+  ChevronDown,
+  Copy,
+  Loader2,
+  Check,
+  Pencil,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +32,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -43,6 +48,8 @@ import { WorkflowsDialog } from "./WorkflowsDialog";
 import { VersionsModal } from "./VersionsModal";
 import { ExecutionHistory } from "./ExecutionHistory";
 import { SchedulesPanel } from "./SchedulesPanel";
+import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Header() {
   const router = useRouter();
@@ -60,77 +67,52 @@ export function Header() {
     redo,
     canUndo,
     canRedo,
+    beautifyLayout,
+    hasConnectedNodes,
   } = useWorkflowStore();
   const { toast } = useToast();
 
-  const getStatusBadge = (status: WorkflowStatus) => {
-    switch (status) {
-      case "draft":
-        return (
-          <Badge variant="secondary" className="text-xs">
-            Draft
-          </Badge>
-        );
-      case "saved":
-        return (
-          <Badge variant="outline" className="text-xs text-green-600 border-green-600">
-            Saved
-          </Badge>
-        );
-      case "modified":
-        return (
-          <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-600">
-            Modified
-          </Badge>
-        );
-    }
-  };
-
-  const formatRelativeTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffSecs = Math.floor(diffMs / 1000);
-    const diffMins = Math.floor(diffSecs / 60);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffSecs < 60) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
-  };
-  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [workflowsOpen, setWorkflowsOpen] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
   const [executionHistoryOpen, setExecutionHistoryOpen] = useState(false);
   const [schedulesOpen, setSchedulesOpen] = useState(false);
-  const [workflowName, setWorkflowName] = useState(workflow?.name || "");
   const [runInput, setRunInput] = useState("{}");
+  const [isSaving, setIsSaving] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSave = async () => {
-    if (!workflowName.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a workflow name",
-        variant: "destructive",
-      });
+  const workflowName = workflow?.name || "Untitled Workflow";
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (isEditingName && nameInputRef.current) {
+      nameInputRef.current.focus();
+      nameInputRef.current.select();
+    }
+  }, [isEditingName]);
+
+  const handleStartEditing = () => {
+    setEditedName(workflowName);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = async () => {
+    if (!editedName.trim()) {
+      setIsEditingName(false);
       return;
     }
 
+    setIsSaving(true);
     try {
-      await saveWorkflow(workflowName);
-      setSaveDialogOpen(false);
-      // Navigate to the workflow URL after saving
+      await saveWorkflow(editedName);
       const savedWorkflowId = useWorkflowStore.getState().currentWorkflowId;
       if (savedWorkflowId) {
         router.push(`/workflow/${savedWorkflowId}`);
       }
       toast({
-        title: "Success",
+        title: "Saved",
         description: "Workflow saved successfully",
       });
     } catch (error) {
@@ -140,6 +122,17 @@ export function Header() {
           error instanceof Error ? error.message : "Failed to save workflow",
         variant: "destructive",
       });
+    } finally {
+      setIsSaving(false);
+      setIsEditingName(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSaveName();
+    } else if (e.key === "Escape") {
+      setIsEditingName(false);
     }
   };
 
@@ -172,170 +165,222 @@ export function Header() {
     }
   };
 
+  const handleQuickSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveWorkflow(workflowName);
+      const savedWorkflowId = useWorkflowStore.getState().currentWorkflowId;
+      if (savedWorkflowId) {
+        router.push(`/workflow/${savedWorkflowId}`);
+      }
+      toast({
+        title: "Saved",
+        description: "Workflow saved successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to save workflow",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const getStatusIndicator = (status: WorkflowStatus) => {
+    switch (status) {
+      case "draft":
+        return (
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
+            Draft
+          </span>
+        );
+      case "saved":
+        return (
+          <span className="flex items-center gap-1.5 text-xs text-emerald-600">
+            <Check className="w-3 h-3" />
+            Saved
+          </span>
+        );
+      case "modified":
+        return (
+          <span className="flex items-center gap-1.5 text-xs text-amber-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            Unsaved changes
+          </span>
+        );
+    }
+  };
+
   return (
     <>
-      <div className="flex flex-col">
-        <header className="h-14 border-b bg-card flex items-center justify-between px-4">
+      <header className="h-14 border-b bg-background/80 backdrop-blur-sm flex items-center justify-between px-4 z-50">
+        {/* Left: Logo + Workflow Name */}
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-primary">Flowys</h1>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-sm">F</span>
+            </div>
+          </Link>
+
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              {workflow?.name || "Untitled Workflow"}
-            </span>
-            {getStatusBadge(workflowStatus)}
-            {workflow?.updatedAt && (
-              <span className="text-xs text-muted-foreground/70" title={new Date(workflow.updatedAt).toLocaleString()}>
-                · Modified {formatRelativeTime(workflow.updatedAt)}
-              </span>
+            {isEditingName ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  ref={nameInputRef}
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  onBlur={handleSaveName}
+                  onKeyDown={handleKeyDown}
+                  className="h-8 w-48 text-sm"
+                  disabled={isSaving}
+                />
+                {isSaving && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+              </div>
+            ) : (
+              <button
+                onClick={handleStartEditing}
+                className={cn(
+                  "flex items-center gap-2 px-2 py-1 rounded-md text-sm font-medium",
+                  "hover:bg-muted transition-colors group"
+                )}
+              >
+                <span>{workflowName}</span>
+                <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
             )}
+            {getStatusIndicator(workflowStatus)}
           </div>
         </div>
+
+        {/* Center: Execution status (when running) */}
+        <div className="absolute left-1/2 -translate-x-1/2">
+          {isExecuting && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span>Running workflow...</span>
+            </div>
+          )}
+        </div>
+
+        {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          {/* Undo/Redo buttons */}
-          <div className="flex items-center">
+          {/* Beautify - only show when nodes are connected */}
+          {hasConnectedNodes() && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={beautifyLayout}
+              className="gap-1.5 h-8"
+              title="Auto-arrange nodes"
+            >
+              <Wand2 className="h-3.5 w-3.5" />
+              Beautify
+            </Button>
+          )}
+
+          {/* Undo/Redo */}
+          <div className="flex items-center border rounded-lg p-0.5 bg-muted/30">
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
+              className="h-7 w-7"
               onClick={undo}
               disabled={!canUndo()}
               title="Undo"
             >
-              <Undo2 className="h-4 w-4" />
+              <Undo2 className="h-3.5 w-3.5" />
             </Button>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
+              className="h-7 w-7"
               onClick={redo}
               disabled={!canRedo()}
               title="Redo"
             >
-              <Redo2 className="h-4 w-4" />
+              <Redo2 className="h-3.5 w-3.5" />
             </Button>
           </div>
 
+          {/* Run Button - Primary action */}
           <Button
-            variant="outline"
-            size="sm"
-            onClick={clearCanvas}
-            title="Clear Canvas"
+            onClick={() => setRunDialogOpen(true)}
+            disabled={isExecuting}
+            className="gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-md"
           >
-            <Trash2 className="h-4 w-4 mr-1" />
-            Clear
+            {isExecuting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+            {isExecuting ? "Running..." : "Run"}
           </Button>
 
-          <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Save className="h-4 w-4 mr-1" />
-                Save
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Save Workflow</DialogTitle>
-              </DialogHeader>
-              <div className="py-4">
-                <Input
-                  placeholder="Workflow name"
-                  value={workflowName}
-                  onChange={(e) => setWorkflowName(e.target.value)}
-                />
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setSaveDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleSave}>Save</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
-          {/* Version History - Only show when workflow is saved */}
-          {currentWorkflowId && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setVersionsOpen(true)}
-              title="Version History"
-            >
-              <History className="h-4 w-4 mr-1" />
-              Versions
-            </Button>
-          )}
-
-          {/* Execution History - Only show when workflow is saved */}
-          {currentWorkflowId && (
-            <Button
-              variant={executionHistoryOpen ? "default" : "outline"}
-              size="sm"
-              onClick={() => setExecutionHistoryOpen(!executionHistoryOpen)}
-              title="Execution History"
-            >
-              <Clock className="h-4 w-4 mr-1" />
-              Executions
-            </Button>
-          )}
-
-          <Dialog open={runDialogOpen} onOpenChange={setRunDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" disabled={isExecuting}>
-                <Play className="h-4 w-4 mr-1" />
-                {isExecuting ? "Running..." : "Run"}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Run Workflow</DialogTitle>
-              </DialogHeader>
-              <div className="py-4">
-                <label className="text-sm font-medium mb-2 block">
-                  Input (JSON)
-                </label>
-                <textarea
-                  className="w-full h-32 p-2 border rounded-md font-mono text-sm bg-background"
-                  value={runInput}
-                  onChange={(e) => setRunInput(e.target.value)}
-                  placeholder='{"text": "Hello, world!"}'
-                />
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setRunDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleRun} disabled={isExecuting}>
-                  {isExecuting ? "Running..." : "Execute"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
-          {/* Hamburger menu for additional options */}
+          {/* Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="icon" className="h-9 w-9">
                 <Menu className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-52">
+              {/* Workflow section */}
+              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                Workflow
+              </div>
+              <DropdownMenuItem onClick={handleQuickSave} disabled={isSaving}>
+                <Save className="h-4 w-4" />
+                {isSaving ? "Saving..." : "Save"}
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => { newWorkflow(); router.replace("/workflow"); }}>
                 <FilePlus className="h-4 w-4" />
                 New Workflow
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setWorkflowsOpen(true)}>
                 <FolderOpen className="h-4 w-4" />
-                Workflows
+                Open Workflow
               </DropdownMenuItem>
+              {currentWorkflowId && (
+                <DropdownMenuItem onClick={() => setVersionsOpen(true)}>
+                  <History className="h-4 w-4" />
+                  Version History
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={clearCanvas}>
+                <Trash2 className="h-4 w-4" />
+                Clear Canvas
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* View section */}
+              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                View
+              </div>
+              {currentWorkflowId && (
+                <DropdownMenuItem onClick={() => setExecutionHistoryOpen(!executionHistoryOpen)}>
+                  <Clock className="h-4 w-4" />
+                  Execution History
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => setSchedulesOpen(true)}>
                 <Calendar className="h-4 w-4" />
                 Scheduled Runs
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
+
+              {/* Settings section */}
+              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                Settings
+              </div>
               <DropdownMenuItem asChild>
                 <Link href="/integrations">
                   <Plug className="h-4 w-4" />
@@ -345,14 +390,23 @@ export function Header() {
               <DropdownMenuItem asChild>
                 <Link href="/settings">
                   <Settings className="h-4 w-4" />
-                  Settings
+                  Webhooks & API Keys
                 </Link>
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
+
+              {/* Help section */}
               <DropdownMenuItem asChild>
                 <Link href="/docs" target="_blank">
                   <BookOpen className="h-4 w-4" />
                   Documentation
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/tutorial">
+                  <Play className="h-4 w-4" />
+                  Tutorial
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -370,7 +424,35 @@ export function Header() {
           />
         </div>
       )}
-      </div>
+
+      {/* Run Dialog */}
+      <Dialog open={runDialogOpen} onOpenChange={setRunDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Run Workflow</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <label className="text-sm font-medium mb-2 block">
+              Input (JSON)
+            </label>
+            <textarea
+              className="w-full h-32 p-3 border rounded-lg font-mono text-sm bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+              value={runInput}
+              onChange={(e) => setRunInput(e.target.value)}
+              placeholder='{"text": "Hello, world!"}'
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRunDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleRun} disabled={isExecuting} className="gap-2">
+              <Play className="h-4 w-4" />
+              {isExecuting ? "Running..." : "Execute"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Workflows Dialog */}
       <WorkflowsDialog open={workflowsOpen} onOpenChange={setWorkflowsOpen} />

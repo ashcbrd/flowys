@@ -286,9 +286,9 @@ export const api = {
         }>
       >("/api/nodes"),
   },
-  chat: {
+  flux: {
     suggestions: () =>
-      fetchApi<{ suggestions: string[] }>("/api/chat"),
+      fetchApi<{ suggestions: string[] }>("/api/flux"),
     send: (data: {
       message: string;
       workflow?: { nodes?: NodeData[]; edges?: EdgeData[] };
@@ -315,7 +315,7 @@ export const api = {
           manualSteps: string[];
           autoFix?: { type: string; description: string };
         };
-      }>("/api/chat", {
+      }>("/api/flux", {
         method: "POST",
         body: JSON.stringify(data),
       }),

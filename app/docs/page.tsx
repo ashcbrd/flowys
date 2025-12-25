@@ -24,28 +24,43 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { DocsSearch } from "@/components/docs/DocsSearch";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 type DocSection = "getting-started" | "nodes" | "integrations" | "api" | "webhooks";
 
 export default function DocsPage() {
   const [activeSection, setActiveSection] = useState<DocSection>("getting-started");
 
+  const handleNavigate = (sectionId: string) => {
+    setActiveSection(sectionId as DocSection);
+    // Scroll to top of content
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <Zap className="h-6 w-6 text-primary" />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+              <Zap className="h-5 w-5 text-white" />
+            </div>
             <span className="text-xl font-bold">Flowys</span>
-            <span className="text-sm text-muted-foreground ml-2">Documentation</span>
+            <span className="text-sm text-muted-foreground ml-2 hidden sm:inline">Documentation</span>
           </Link>
-          <Button asChild>
-            <Link href="/workflow" target="_blank">
-              Open App
-              <ArrowRight className="h-4 w-4 ml-1" />
-            </Link>
-          </Button>
+
+          <div className="flex items-center gap-3">
+            <DocsSearch onNavigate={handleNavigate} />
+            <ThemeToggle />
+            <Button asChild>
+              <Link href="/workflow" target="_blank">
+                Open App
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 

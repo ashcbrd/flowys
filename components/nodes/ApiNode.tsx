@@ -8,8 +8,9 @@ export function ApiNode(props: NodeProps) {
   return (
     <BaseNode
       {...props}
-      icon={<Globe className="h-4 w-4" />}
-      color="bg-blue-600"
+      icon={<Globe className="h-5 w-5" />}
+      color="bg-sky-500"
+      gradient="from-sky-400 to-sky-600"
     />
   );
 }

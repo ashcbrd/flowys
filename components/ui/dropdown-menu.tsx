@@ -40,10 +40,31 @@ const DropdownMenuContext = React.createContext<{
 
 export function DropdownMenu({ children }: DropdownMenuProps) {
   const [open, setOpen] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  // Close on click outside the entire dropdown container
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      // Use setTimeout to avoid immediate trigger on the same click
+      const timer = setTimeout(() => {
+        document.addEventListener("click", handleClickOutside);
+      }, 0);
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener("click", handleClickOutside);
+      };
+    }
+  }, [open]);
 
   return (
     <DropdownMenuContext.Provider value={{ open, setOpen }}>
-      <div className="relative inline-block">{children}</div>
+      <div ref={containerRef} className="relative inline-block">{children}</div>
     </DropdownMenuContext.Provider>
   );
 }
@@ -70,30 +91,12 @@ export function DropdownMenuTrigger({ children, asChild }: DropdownMenuTriggerPr
 }
 
 export function DropdownMenuContent({ children, align = "end", className }: DropdownMenuContentProps) {
-  const { open, setOpen } = React.useContext(DropdownMenuContext);
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [open, setOpen]);
+  const { open } = React.useContext(DropdownMenuContext);
 
   if (!open) return null;
 
   return (
     <div
-      ref={ref}
       className={cn(
         "absolute z-50 min-w-[180px] mt-1 py-1 bg-popover border rounded-md shadow-lg",
         align === "end" && "right-0",

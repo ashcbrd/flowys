@@ -8,8 +8,9 @@ export function OutputNode(props: NodeProps) {
   return (
     <BaseNode
       {...props}
-      icon={<FileOutput className="h-4 w-4" />}
-      color="bg-red-600"
+      icon={<FileOutput className="h-5 w-5" />}
+      color="bg-rose-500"
+      gradient="from-rose-400 to-rose-600"
       hasOutput={false}
     />
   );

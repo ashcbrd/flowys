@@ -12,7 +12,6 @@ import {
   Code,
   Webhook,
   Bot,
-  FileText,
   GitBranch,
   Shield,
   Clock,
@@ -145,6 +144,9 @@ export default function LandingPage() {
             <Link href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
               Pricing
             </Link>
+            <Link href="/tutorial" className="text-gray-600 hover:text-gray-900 transition-colors">
+              Tutorial
+            </Link>
             <Link href="/docs" className="text-gray-600 hover:text-gray-900 transition-colors">
               Docs
             </Link>
@@ -193,11 +195,11 @@ export default function LandingPage() {
               Start Building
             </Link>
             <Link
-              href="/docs"
+              href="/tutorial"
               className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-gray-50 border border-gray-200 text-gray-900 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-sm"
             >
-              <FileText className="w-5 h-5" />
-              Read the Docs
+              <Play className="w-5 h-5" />
+              How it works
             </Link>
           </div>
         </div>

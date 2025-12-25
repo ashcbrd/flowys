@@ -33,7 +33,7 @@ const ChatMessageSchema = z.object({
     .optional(),
 });
 
-const SYSTEM_PROMPT = `You are Flowy, the AI assistant for Flowys - a node-based workflow automation platform.
+const SYSTEM_PROMPT = `You are Flux, the AI assistant for Flowys - a node-based workflow automation platform.
 
 YOUR CAPABILITIES:
 1. Create complete workflows from user descriptions
@@ -253,7 +253,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("Chat error:", error);
+    console.error("Flux error:", error);
     return NextResponse.json(
       {
         message: "Sorry, I encountered an error. Please try again.",

@@ -6,6 +6,8 @@ import {
   Background,
   Controls,
   MiniMap,
+  useReactFlow,
+  ReactFlowProvider,
   type OnConnect,
   type NodeMouseHandler,
 } from "@xyflow/react";
@@ -17,6 +19,7 @@ import { AiNode } from "@/components/nodes/AiNode";
 import { LogicNode } from "@/components/nodes/LogicNode";
 import { OutputNode } from "@/components/nodes/OutputNode";
 import { IntegrationNode } from "@/components/nodes/IntegrationNode";
+import { WebhookNode } from "@/components/nodes/WebhookNode";
 
 const nodeTypes = {
   input: InputNode,
@@ -25,10 +28,12 @@ const nodeTypes = {
   logic: LogicNode,
   output: OutputNode,
   integration: IntegrationNode,
+  webhook: WebhookNode,
 };
 
-export function WorkflowCanvas() {
+function WorkflowCanvasInner() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const { screenToFlowPosition } = useReactFlow();
   const {
     nodes,
     edges,
@@ -69,17 +74,21 @@ export function WorkflowCanvas() {
       const type = event.dataTransfer.getData("application/reactflow");
       if (!type) return;
 
-      const bounds = reactFlowWrapper.current?.getBoundingClientRect();
-      if (!bounds) return;
+      // Convert screen coordinates to flow coordinates
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
-      const position = {
-        x: event.clientX - bounds.left - 100,
-        y: event.clientY - bounds.top - 25,
+      // Offset to center the node on cursor
+      const adjustedPosition = {
+        x: position.x - 110, // Half of node width (~220)
+        y: position.y - 40,  // Approximate offset for node header
       };
 
-      addNode(type as "input" | "api" | "ai" | "logic" | "output" | "integration", position);
+      addNode(type as "input" | "api" | "ai" | "logic" | "output" | "integration" | "webhook", adjustedPosition);
     },
-    [addNode]
+    [addNode, screenToFlowPosition]
   );
 
   return (
@@ -112,5 +121,13 @@ export function WorkflowCanvas() {
         />
       </ReactFlow>
     </div>
+  );
+}
+
+export function WorkflowCanvas() {
+  return (
+    <ReactFlowProvider>
+      <WorkflowCanvasInner />
+    </ReactFlowProvider>
   );
 }

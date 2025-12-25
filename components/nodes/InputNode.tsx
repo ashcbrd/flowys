@@ -8,8 +8,9 @@ export function InputNode(props: NodeProps) {
   return (
     <BaseNode
       {...props}
-      icon={<FileInput className="h-4 w-4" />}
-      color="bg-green-600"
+      icon={<FileInput className="h-5 w-5" />}
+      color="bg-emerald-500"
+      gradient="from-emerald-400 to-emerald-600"
       hasInput={false}
     />
   );

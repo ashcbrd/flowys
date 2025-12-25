@@ -8,8 +8,9 @@ export function LogicNode(props: NodeProps) {
   return (
     <BaseNode
       {...props}
-      icon={<GitBranch className="h-4 w-4" />}
-      color="bg-orange-600"
+      icon={<GitBranch className="h-5 w-5" />}
+      color="bg-amber-500"
+      gradient="from-amber-400 to-amber-600"
     />
   );
 }

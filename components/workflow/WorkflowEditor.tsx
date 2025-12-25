@@ -3,10 +3,11 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { WorkflowCanvas } from "@/components/canvas/WorkflowCanvas";
-import { Sidebar } from "@/components/panels/Sidebar";
-import { ExecutionPanel } from "@/components/panels/ExecutionPanel";
+import { NodeDock } from "@/components/panels/NodeDock";
+import { ConfigDrawer } from "@/components/panels/ConfigDrawer";
 import { Header } from "@/components/panels/Header";
-import { ChatWidget } from "@/components/chat/ChatWidget";
+import { FluxWidget } from "@/components/flux/FluxWidget";
+import { WelcomeState } from "@/components/workflow/WelcomeState";
 import { useWorkflowStore } from "@/store/workflow";
 import { api } from "@/lib/api";
 
@@ -118,17 +119,18 @@ export function WorkflowEditor({ workflowId, versionId }: WorkflowEditorProps) {
     }
   }, [workflow?.id, workflowId, router]);
 
+  const showWelcome = nodes.length === 0;
+
   return (
     <div className="h-screen flex flex-col bg-background">
       <Header />
-      <div className="flex-1 flex overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 relative">
-          <WorkflowCanvas />
-        </main>
-        <ExecutionPanel />
+      <div className="flex-1 relative overflow-hidden">
+        <WorkflowCanvas />
+        {showWelcome && <WelcomeState />}
+        <NodeDock />
+        <ConfigDrawer />
       </div>
-      <ChatWidget />
+      <FluxWidget />
     </div>
   );
 }

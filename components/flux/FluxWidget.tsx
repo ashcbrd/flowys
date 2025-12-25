@@ -78,7 +78,7 @@ const DEFAULT_SUGGESTIONS = [
   "Help me fix my workflow",
 ];
 
-export function ChatWidget() {
+export function FluxWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -107,7 +107,7 @@ export function ChatWidget() {
         {
           role: "assistant",
           content:
-            "Hey! I'm Flowy, your workflow assistant. I can create workflows for you, help you debug issues, and answer questions. Try asking me to create a workflow!",
+            "Hey! I'm Flux, your workflow assistant. I can create workflows for you, help you debug issues, and answer questions. Try asking me to create a workflow!",
           suggestions: DEFAULT_SUGGESTIONS,
         },
       ]);
@@ -126,7 +126,7 @@ export function ChatWidget() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/flux", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -324,10 +324,10 @@ export function ChatWidget() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-all duration-300 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white hover:scale-105 active:scale-95"
+          className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white hover:scale-105 active:scale-95"
         >
           <Bot className="h-5 w-5" />
-          <span className="font-medium">Ask Flowy</span>
+          <span className="font-medium">Ask Flux</span>
         </button>
       )}
 
@@ -335,13 +335,13 @@ export function ChatWidget() {
       {isOpen && (
         <div className="fixed bottom-6 right-6 z-[9999] flex flex-col w-[420px] h-[600px] bg-background border rounded-2xl shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-violet-600 to-indigo-600 rounded-t-2xl">
+          <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-500 to-indigo-600 rounded-t-2xl">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Flowy</h3>
+                <h3 className="font-semibold text-white">Flux</h3>
                 <p className="text-xs text-white/70">Workflow Assistant</p>
               </div>
             </div>
@@ -365,10 +365,10 @@ export function ChatWidget() {
               >
                 {msg.role === "assistant" && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
                       <Sparkles className="h-3 w-3 text-white" />
                     </div>
-                    <span>Flowy</span>
+                    <span>Flux</span>
                   </div>
                 )}
 
@@ -377,7 +377,7 @@ export function ChatWidget() {
                   className={cn(
                     "max-w-[90%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                     msg.role === "user"
-                      ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-br-md"
+                      ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-br-md"
                       : "bg-muted rounded-tl-md"
                   )}
                 >
@@ -386,22 +386,22 @@ export function ChatWidget() {
 
                 {/* Workflow Generation Section */}
                 {msg.workflowGeneration && (
-                  <div className="max-w-[90%] mt-2 p-3 bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-xl">
-                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-medium text-sm mb-2">
+                  <div className="max-w-[90%] mt-2 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium text-sm mb-2">
                       <Wand2 className="h-4 w-4" />
                       Workflow Ready
                     </div>
-                    <p className="text-xs text-purple-700 dark:text-purple-300 mb-2">
+                    <p className="text-xs text-blue-700 dark:text-blue-300 mb-2">
                       {msg.workflowGeneration.description}
                     </p>
-                    <div className="text-xs text-purple-600 dark:text-purple-400 mb-3">
+                    <div className="text-xs text-blue-600 dark:text-blue-400 mb-3">
                       <strong>{msg.workflowGeneration.nodes.length}</strong> nodes &bull;{" "}
                       <strong>{msg.workflowGeneration.edges.length}</strong> connections
                     </div>
                     <Button
                       size="sm"
                       onClick={() => handleCreateWorkflow(msg.workflowGeneration!)}
-                      className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white border-0 rounded-lg"
+                      className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white border-0 rounded-lg"
                     >
                       <Wand2 className="h-3 w-3 mr-2" />
                       Create This Workflow
@@ -492,12 +492,12 @@ export function ChatWidget() {
 
             {isLoading && (
               <div className="flex items-start gap-2">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
                   <Sparkles className="h-3 w-3 text-white" />
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground bg-muted rounded-2xl rounded-tl-md px-4 py-3">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Flowing...</span>
+                  <span className="text-sm">Thinking...</span>
                 </div>
               </div>
             )}
@@ -528,7 +528,7 @@ export function ChatWidget() {
                 size="icon"
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || isLoading}
-                className="h-11 w-11 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
+                className="h-11 w-11 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
               >
                 <Send className="h-4 w-4" />
               </Button>

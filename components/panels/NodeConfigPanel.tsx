@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Trash2, Plus, GripVertical, Loader2, ExternalLink } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { X, Trash2, Plus, GripVertical, Loader2, ExternalLink, Save, Check } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,25 +16,77 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useWorkflowStore } from "@/store/workflow";
+import { cn } from "@/lib/utils";
 
 export function NodeConfigPanel() {
   const { selectedNode, selectNode, updateNodeConfig, updateNodeLabel, deleteNode } =
     useWorkflowStore();
 
-  if (!selectedNode) return null;
+  // Local state for pending changes
+  const [pendingConfig, setPendingConfig] = useState<Record<string, unknown>>({});
+  const [pendingLabel, setPendingLabel] = useState<string>("");
+  const [originalConfig, setOriginalConfig] = useState<Record<string, unknown>>({});
+  const [originalLabel, setOriginalLabel] = useState<string>("");
+  const [isSaved, setIsSaved] = useState(false);
 
-  const config = selectedNode.data.config as Record<string, unknown>;
+  // Initialize local state when node is selected
+  useEffect(() => {
+    if (selectedNode) {
+      const config = selectedNode.data.config as Record<string, unknown>;
+      setPendingConfig(config);
+      setOriginalConfig(JSON.parse(JSON.stringify(config)));
+      setPendingLabel(selectedNode.data.label);
+      setOriginalLabel(selectedNode.data.label);
+      setIsSaved(false);
+    }
+  }, [selectedNode?.id]);
 
-  const handleConfigChange = (key: string, value: unknown) => {
-    updateNodeConfig(selectedNode.id, { ...config, [key]: value });
-  };
+  // Check if there are unsaved changes
+  const hasChanges = useMemo(() => {
+    if (!selectedNode) return false;
+    const configChanged = JSON.stringify(pendingConfig) !== JSON.stringify(originalConfig);
+    const labelChanged = pendingLabel !== originalLabel;
+    return configChanged || labelChanged;
+  }, [pendingConfig, originalConfig, pendingLabel, originalLabel, selectedNode]);
+
+  const handleConfigChange = useCallback((key: string, value: unknown) => {
+    setPendingConfig(prev => ({ ...prev, [key]: value }));
+    setIsSaved(false);
+  }, []);
+
+  const handleLabelChange = useCallback((value: string) => {
+    setPendingLabel(value);
+    setIsSaved(false);
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (!selectedNode) return;
+
+    // Save to store
+    updateNodeConfig(selectedNode.id, pendingConfig);
+    if (pendingLabel !== originalLabel) {
+      updateNodeLabel(selectedNode.id, pendingLabel);
+    }
+
+    // Update original values to current
+    setOriginalConfig(JSON.parse(JSON.stringify(pendingConfig)));
+    setOriginalLabel(pendingLabel);
+    setIsSaved(true);
+
+    // Reset saved indicator after 2 seconds
+    setTimeout(() => setIsSaved(false), 2000);
+  }, [selectedNode, pendingConfig, pendingLabel, originalLabel, updateNodeConfig, updateNodeLabel]);
 
   const handleDelete = () => {
-    deleteNode(selectedNode.id);
+    if (selectedNode) {
+      deleteNode(selectedNode.id);
+    }
   };
 
+  if (!selectedNode) return null;
+
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto flex flex-col">
       <div className="p-4 border-b flex items-center justify-between">
         <h2 className="font-semibold">Node Configuration</h2>
         <Button variant="ghost" size="icon" onClick={() => selectNode(null)}>
@@ -42,44 +94,70 @@ export function NodeConfigPanel() {
         </Button>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 flex-1">
         <div>
           <Label>Label</Label>
           <Input
-            value={selectedNode.data.label}
-            onChange={(e) => updateNodeLabel(selectedNode.id, e.target.value)}
+            value={pendingLabel}
+            onChange={(e) => handleLabelChange(e.target.value)}
             className="mt-1"
           />
         </div>
 
         {selectedNode.type === "input" && (
-          <InputNodeConfig config={config} onChange={handleConfigChange} />
+          <InputNodeConfig config={pendingConfig} onChange={handleConfigChange} />
         )}
         {selectedNode.type === "api" && (
-          <ApiNodeConfig config={config} onChange={handleConfigChange} />
+          <ApiNodeConfig config={pendingConfig} onChange={handleConfigChange} />
         )}
         {selectedNode.type === "ai" && (
-          <AiNodeConfig config={config} onChange={handleConfigChange} />
+          <AiNodeConfig config={pendingConfig} onChange={handleConfigChange} />
         )}
         {selectedNode.type === "logic" && (
-          <LogicNodeConfig config={config} onChange={handleConfigChange} />
+          <LogicNodeConfig config={pendingConfig} onChange={handleConfigChange} />
         )}
         {selectedNode.type === "output" && (
-          <OutputNodeConfig config={config} onChange={handleConfigChange} />
+          <OutputNodeConfig config={pendingConfig} onChange={handleConfigChange} />
         )}
         {selectedNode.type === "integration" && (
-          <IntegrationNodeConfig config={config} onChange={handleConfigChange} />
+          <IntegrationNodeConfig config={pendingConfig} onChange={handleConfigChange} />
         )}
         {selectedNode.type === "webhook" && (
-          <WebhookNodeConfig config={config} onChange={handleConfigChange} />
+          <WebhookNodeConfig config={pendingConfig} onChange={handleConfigChange} />
         )}
+      </div>
 
-        <div className="pt-4 border-t">
-          <Button variant="destructive" size="sm" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4 mr-1" />
-            Delete Node
-          </Button>
-        </div>
+      {/* Fixed footer with Save and Delete buttons */}
+      <div className="p-4 border-t bg-background sticky bottom-0 space-y-3">
+        <Button
+          onClick={handleSave}
+          disabled={!hasChanges && !isSaved}
+          className={cn(
+            "w-full gap-2 transition-all",
+            hasChanges
+              ? "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+              : isSaved
+              ? "bg-green-500 hover:bg-green-500"
+              : "bg-muted text-muted-foreground hover:bg-muted"
+          )}
+        >
+          {isSaved ? (
+            <>
+              <Check className="h-4 w-4" />
+              Saved
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              {hasChanges ? "Save Configuration" : "No Changes"}
+            </>
+          )}
+        </Button>
+
+        <Button variant="destructive" size="sm" onClick={handleDelete} className="w-full">
+          <Trash2 className="h-4 w-4 mr-1" />
+          Delete Node
+        </Button>
       </div>
     </div>
   );

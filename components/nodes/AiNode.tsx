@@ -8,8 +8,9 @@ export function AiNode(props: NodeProps) {
   return (
     <BaseNode
       {...props}
-      icon={<Sparkles className="h-4 w-4" />}
-      color="bg-purple-600"
+      icon={<Sparkles className="h-5 w-5" />}
+      color="bg-violet-500"
+      gradient="from-violet-400 to-violet-600"
     />
   );
 }

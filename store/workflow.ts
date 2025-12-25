@@ -98,6 +98,10 @@ interface WorkflowState {
   redo: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
+
+  // Layout
+  beautifyLayout: () => void;
+  hasConnectedNodes: () => boolean;
 }
 
 const generateId = () => `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -255,6 +259,87 @@ export const useWorkflowStore = create<WorkflowState>()(
       canRedo: () => {
         const { history, historyIndex } = get();
         return historyIndex + 2 < history.length;
+      },
+
+      hasConnectedNodes: () => {
+        const { edges } = get();
+        return edges.length > 0;
+      },
+
+      beautifyLayout: () => {
+        const { nodes, edges, setNodes, pushHistory } = get();
+        if (nodes.length === 0) return;
+
+        pushHistory();
+
+        // Build adjacency list and in-degree map
+        const adjList = new Map<string, string[]>();
+        const inDegree = new Map<string, number>();
+
+        nodes.forEach((node) => {
+          adjList.set(node.id, []);
+          inDegree.set(node.id, 0);
+        });
+
+        edges.forEach((edge) => {
+          adjList.get(edge.source)?.push(edge.target);
+          inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
+        });
+
+        // Topological sort with layers
+        const layers: string[][] = [];
+        let currentLayer = nodes.filter((n) => inDegree.get(n.id) === 0).map((n) => n.id);
+
+        while (currentLayer.length > 0) {
+          layers.push(currentLayer);
+          const nextLayer: string[] = [];
+
+          currentLayer.forEach((nodeId) => {
+            adjList.get(nodeId)?.forEach((targetId) => {
+              const newDegree = (inDegree.get(targetId) || 0) - 1;
+              inDegree.set(targetId, newDegree);
+              if (newDegree === 0) {
+                nextLayer.push(targetId);
+              }
+            });
+          });
+
+          currentLayer = nextLayer;
+        }
+
+        // Handle any remaining nodes (cycles or unconnected)
+        const placedNodes = new Set(layers.flat());
+        const unplacedNodes = nodes.filter((n) => !placedNodes.has(n.id)).map((n) => n.id);
+        if (unplacedNodes.length > 0) {
+          layers.push(unplacedNodes);
+        }
+
+        // Calculate positions
+        const nodeWidth = 220;
+        const nodeHeight = 100;
+        const horizontalGap = 100;
+        const verticalGap = 60;
+
+        const newPositions = new Map<string, { x: number; y: number }>();
+
+        layers.forEach((layer, layerIndex) => {
+          const layerHeight = layer.length * nodeHeight + (layer.length - 1) * verticalGap;
+          const startY = -layerHeight / 2;
+
+          layer.forEach((nodeId, nodeIndex) => {
+            newPositions.set(nodeId, {
+              x: layerIndex * (nodeWidth + horizontalGap),
+              y: startY + nodeIndex * (nodeHeight + verticalGap),
+            });
+          });
+        });
+
+        const layoutedNodes = nodes.map((node) => ({
+          ...node,
+          position: newPositions.get(node.id) || node.position,
+        }));
+
+        setNodes(layoutedNodes);
       },
 
       onNodesChange: (changes) => {
