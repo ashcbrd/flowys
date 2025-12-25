@@ -19,6 +19,7 @@ import {
   Check,
   Sparkles,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 // Animated pixel background component
 function PixelBackground() {
@@ -152,6 +153,7 @@ export default function LandingPage() {
             </Link>
           </div>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <Link
               href="/workflow"
               target="_blank"

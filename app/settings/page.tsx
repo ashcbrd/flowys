@@ -42,6 +42,7 @@ import {
   type ApiKeyScope,
 } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const WEBHOOK_EVENTS: { value: WebhookEvent; label: string }[] = [
@@ -297,10 +298,13 @@ export default function SettingsPage() {
             <h1 className="text-lg font-semibold">Settings</h1>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-          <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
+            <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
+            Refresh
+          </Button>
+        </div>
       </header>
 
       {/* Main Content */}

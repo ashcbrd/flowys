@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 // Tutorial steps
@@ -113,12 +114,15 @@ export default function TutorialPage() {
             <span className="text-xl font-bold">Flowys</span>
             <span className="text-sm text-muted-foreground ml-2">Tutorial</span>
           </Link>
-          <Button variant="outline" asChild>
-            <Link href="/workflow">
-              Skip Tutorial
-              <X className="h-4 w-4 ml-1" />
-            </Link>
-          </Button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Button variant="outline" asChild>
+              <Link href="/workflow">
+                Skip Tutorial
+                <X className="h-4 w-4 ml-1" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 

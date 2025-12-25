@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 interface IntegrationConfig {
@@ -401,18 +402,21 @@ export default function IntegrationsPage() {
             <h1 className="text-lg font-semibold">App Integrations</h1>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            fetchIntegrations();
-            fetchConnections();
-          }}
-          disabled={loading}
-        >
-          <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              fetchIntegrations();
+              fetchConnections();
+            }}
+            disabled={loading}
+          >
+            <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
+            Refresh
+          </Button>
+        </div>
       </header>
 
       {/* Main Content */}
