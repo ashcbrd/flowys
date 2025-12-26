@@ -95,10 +95,10 @@ function PricingSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Free to start. Simple to scale.
+            Simple pricing. Unlimited potential.
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Build your first workflow in minutes—no credit card required. Upgrade only when you&apos;re ready.
+            Choose the plan that matches your ambition. Every tier unlocks more power.
           </p>
         </div>
 
@@ -202,7 +202,7 @@ function PricingSection() {
               rel="noopener noreferrer"
               className="block w-full py-2.5 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors text-sm"
             >
-              Get Started for Free
+              Try It Out
             </Link>
           </div>
 
@@ -249,7 +249,7 @@ function PricingSection() {
               rel="noopener noreferrer"
               className="block w-full py-2.5 text-center bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all shadow-md text-sm"
             >
-              Choose Pro
+              Get Pro
             </Link>
           </div>
 
@@ -292,7 +292,7 @@ function PricingSection() {
               rel="noopener noreferrer"
               className="block w-full py-2.5 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors text-sm"
             >
-              Choose Business
+              Get Business
             </Link>
           </div>
         </div>
@@ -401,7 +401,7 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center gap-2 shadow-md shadow-blue-500/20"
             >
-              Start Free
+              Get Started
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -412,20 +412,20 @@ export default function LandingPage() {
       <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/30 dark:to-background relative overflow-hidden">
         <PixelBackground />
         <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-full text-blue-700 dark:text-blue-300 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
-            Free forever. No credit card.
+            The visual AI automation platform
           </div>
           <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
-            Automate anything.
+            Stop wasting time.
             <br />
             <span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
-              Ship in minutes.
+              Start automating.
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-            Build powerful AI workflows by dragging and dropping nodes. No code needed.
-            Start free and automate the boring stuff today.
+            Connect AI, APIs, and logic into workflows that run themselves.
+            What used to take days of coding now takes minutes of clicking.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -435,14 +435,14 @@ export default function LandingPage() {
               className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-lg shadow-blue-500/25"
             >
               <Play className="w-5 h-5" />
-              Start Free
+              Start Building
             </Link>
             <Link
               href="/tutorial"
               className="w-full sm:w-auto px-8 py-4 bg-background hover:bg-muted border border-border text-foreground font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-sm"
             >
               <Play className="w-5 h-5" />
-              Try the Interactive Tutorial
+              See It in Action
             </Link>
           </div>
         </div>
@@ -551,9 +551,9 @@ export default function LandingPage() {
             <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <DollarSign className="w-8 h-8 text-amber-600 dark:text-amber-400" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-3">Free to start, fair to scale</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-3">Pay for what you use</h3>
             <p className="text-muted-foreground leading-relaxed">
-              No credit card. No per-user fees. Build your first workflow today, upgrade only when you&apos;re ready.
+              No per-user fees. No surprises. Simple credit-based pricing that scales with your needs.
             </p>
           </div>
         </div>
@@ -567,8 +567,8 @@ export default function LandingPage() {
               Everything you need. Nothing you don&apos;t.
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Powerful enough for production, simple enough for your first workflow.
-              Start building for free, unlock more as you grow.
+              Powerful enough for enterprise. Simple enough to start today.
+              Built for teams who ship fast.
             </p>
           </div>
 
@@ -659,10 +659,10 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Three steps. That&apos;s it.
+              Build once. Run forever.
             </h2>
             <p className="text-xl text-muted-foreground">
-              Go from idea to working automation in under 5 minutes—for free.
+              Go from idea to production-ready automation in under 5 minutes.
             </p>
           </div>
 
@@ -711,10 +711,10 @@ export default function LandingPage() {
       <section className="py-24 px-6 bg-gradient-to-br from-blue-600 to-blue-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to stop doing things manually?
+            Your competitors are already automating.
           </h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Join thousands of makers who automated their busywork. Free forever—upgrade when you need more.
+            Every hour you spend on repetitive tasks is an hour your competition uses to get ahead. Start building smarter today.
           </p>
           <Link
             href="/workflow"
@@ -723,7 +723,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-3 px-10 py-5 bg-white hover:bg-gray-50 text-blue-700 font-semibold rounded-xl transition-all duration-200 text-lg shadow-lg"
           >
             <Zap className="w-6 h-6" />
-            Get Started for Free
+            Start Automating Now
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
