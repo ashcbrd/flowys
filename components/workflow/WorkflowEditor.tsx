@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { WorkflowCanvas } from "@/components/canvas/WorkflowCanvas";
 import { NodeDock } from "@/components/panels/NodeDock";
 import { ConfigDrawer } from "@/components/panels/ConfigDrawer";
+import { ExecutionDrawer } from "@/components/panels/ExecutionDrawer";
 import { Header } from "@/components/panels/Header";
 import { FluxWidget } from "@/components/flux/FluxWidget";
 import { WelcomeState } from "@/components/workflow/WelcomeState";
@@ -129,6 +130,7 @@ export function WorkflowEditor({ workflowId, versionId }: WorkflowEditorProps) {
         {showWelcome && <WelcomeState />}
         <NodeDock />
         <ConfigDrawer />
+        <ExecutionDrawer />
       </div>
       <FluxWidget />
     </div>

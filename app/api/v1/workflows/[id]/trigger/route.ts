@@ -4,6 +4,12 @@ import { connectToDatabase, Workflow, Execution } from "@/lib/db";
 import { authenticateApiKey, createApiErrorResponse } from "@/lib/middleware/apiAuth";
 import { WorkflowExecutor } from "@/lib/engine/executor";
 import { triggerWebhooks } from "@/lib/services/webhookService";
+import {
+  hasEnoughCredits,
+  deductCredits,
+  validateWorkflowAgainstPlan,
+  calculateWorkflowCost,
+} from "@/lib/subscription";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -63,6 +69,24 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     if (!workflow) {
       return createApiErrorResponse("Workflow not found", 404);
+    }
+
+    // Validate workflow against plan limits (node types, node count)
+    const validation = await validateWorkflowAgainstPlan(workflow.userId, workflow.nodes);
+    if (!validation.valid) {
+      return createApiErrorResponse(
+        `Plan limit exceeded: ${validation.errors.join(", ")}`,
+        403
+      );
+    }
+
+    // Check if user has enough credits
+    const creditCheck = await hasEnoughCredits(workflow.userId, workflow.nodes);
+    if (!creditCheck.hasCredits) {
+      return createApiErrorResponse(
+        `Insufficient credits. Required: ${creditCheck.required}, Remaining: ${creditCheck.remaining}`,
+        402
+      );
     }
 
     // Parse input
@@ -125,6 +149,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
       const duration = Date.now() - startTime;
 
+      // Deduct credits after execution
+      const creditCost = calculateWorkflowCost(workflow.nodes);
+      const deduction = await deductCredits(workflow.userId, creditCost);
+
       // Update execution
       await Execution.updateOne(
         { _id: execution._id },
@@ -159,7 +187,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           status: result.success ? "completed" : "failed",
           output: result.output,
           error: result.error,
-          duration
+          duration,
+          credits: {
+            used: creditCost,
+            remaining: deduction.remaining,
+          },
         }
       });
 
@@ -214,6 +246,10 @@ async function executeWorkflowAsync(
   try {
     const executor = new WorkflowExecutor(workflow.nodes, workflow.edges);
     const result = await executor.execute(input);
+
+    // Deduct credits after execution
+    const creditCost = calculateWorkflowCost(workflow.nodes);
+    await deductCredits(workflow.userId, creditCost);
 
     // Update execution
     await Execution.updateOne(

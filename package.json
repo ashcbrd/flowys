@@ -26,6 +26,7 @@
     "@xyflow/react": "^12.3.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dodopayments": "^2.13.1",
     "lucide-react": "^0.460.0",
     "mongodb": "^6.21.0",
     "mongoose": "^8.8.4",

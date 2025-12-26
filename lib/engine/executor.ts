@@ -25,6 +25,8 @@ export interface ExecutionContext {
   logs: ExecutionLog[];
 }
 
+export type ExecutionCallback = (log: ExecutionLog, allLogs: ExecutionLog[]) => void;
+
 export class WorkflowExecutor {
   private nodes: NodeData[];
   private edges: EdgeData[];
@@ -255,7 +257,8 @@ export class WorkflowExecutor {
   }
 
   async execute(
-    input: Record<string, unknown> = {}
+    input: Record<string, unknown> = {},
+    onNodeUpdate?: ExecutionCallback
   ): Promise<WorkflowExecutionResult> {
     const startTime = Date.now();
     const context: ExecutionContext = {
@@ -283,6 +286,11 @@ export class WorkflowExecutor {
 
         context.logs.push(log);
 
+        // Notify that node is starting
+        if (onNodeUpdate) {
+          onNodeUpdate(log, [...context.logs]);
+        }
+
         let nodeInputs = this.getNodeInputs(nodeId, context);
 
         if (node.type === "input") {
@@ -304,6 +312,11 @@ export class WorkflowExecutor {
           log.completedAt = new Date().toISOString();
           log.duration = Date.now() - nodeStartTime;
 
+          // Notify that node failed
+          if (onNodeUpdate) {
+            onNodeUpdate(log, [...context.logs]);
+          }
+
           const errorAnalysis = this.analyzeError(
             node,
             result.error || "Unknown error",
@@ -324,6 +337,11 @@ export class WorkflowExecutor {
         log.output = result.output;
         log.completedAt = new Date().toISOString();
         log.duration = Date.now() - nodeStartTime;
+
+        // Notify that node completed
+        if (onNodeUpdate) {
+          onNodeUpdate(log, [...context.logs]);
+        }
 
         context.nodeOutputs.set(nodeId, result.output || {});
 

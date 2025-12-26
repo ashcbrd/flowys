@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import {
   Plug,
   Plus,
@@ -15,7 +14,6 @@ import {
   Link2,
   AlertTriangle,
   Play,
-  ArrowLeft,
   CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,7 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Navbar } from "@/components/shared/Navbar";
 import { cn } from "@/lib/utils";
 
 interface IntegrationConfig {
@@ -387,37 +385,20 @@ export default function IntegrationsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="h-14 border-b bg-card flex items-center justify-between px-6">
-        <div className="flex items-center gap-4">
-          <Link href="/workflow">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Workflows
-            </Button>
-          </Link>
-          <div className="h-6 w-px bg-border" />
-          <div className="flex items-center gap-2">
-            <Plug className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-semibold">App Integrations</h1>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              fetchIntegrations();
-              fetchConnections();
-            }}
-            disabled={loading}
-          >
-            <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
-            Refresh
-          </Button>
-        </div>
-      </header>
+      <Navbar title="App Integrations" icon={Plug}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            fetchIntegrations();
+            fetchConnections();
+          }}
+          disabled={loading}
+        >
+          <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
+          Refresh
+        </Button>
+      </Navbar>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">

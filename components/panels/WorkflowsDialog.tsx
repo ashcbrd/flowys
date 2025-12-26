@@ -13,6 +13,7 @@ import {
   Copy,
   History,
   FileEdit,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +31,15 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { VersionsModal } from "./VersionsModal";
 import { ExecutionHistory } from "./ExecutionHistory";
+
+type PlanType = "free" | "builder" | "team";
+
+// Workflow limits per plan
+const WORKFLOW_LIMITS: Record<PlanType, number> = {
+  free: 3,
+  builder: 10,
+  team: -1, // Unlimited
+};
 
 interface WorkflowsDialogProps {
   open?: boolean;
@@ -63,6 +73,23 @@ export function WorkflowsDialog({ open: controlledOpen, onOpenChange }: Workflow
   const router = useRouter();
   const { loadWorkflow, hasDraft, loadDraft, draftWorkflow } = useWorkflowStore();
   const { toast } = useToast();
+  const [userPlan, setUserPlan] = useState<PlanType>("free");
+
+  // Fetch user's subscription plan
+  useEffect(() => {
+    const fetchPlan = async () => {
+      try {
+        const res = await fetch("/api/subscription");
+        if (res.ok) {
+          const data = await res.json();
+          setUserPlan(data.subscription?.plan || "free");
+        }
+      } catch {
+        setUserPlan("free");
+      }
+    };
+    fetchPlan();
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -70,6 +97,9 @@ export function WorkflowsDialog({ open: controlledOpen, onOpenChange }: Workflow
       setSelectedWorkflows(new Set());
     }
   }, [open]);
+
+  const workflowLimit = WORKFLOW_LIMITS[userPlan];
+  const isAtLimit = workflowLimit !== -1 && workflows.length >= workflowLimit;
 
   const fetchWorkflows = async () => {
     setLoading(true);
@@ -107,6 +137,18 @@ export function WorkflowsDialog({ open: controlledOpen, onOpenChange }: Workflow
 
   const handleDuplicate = async (workflow: Workflow, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // Check if at workflow limit
+    if (isAtLimit) {
+      const upgradeTo = userPlan === "free" ? "Builder" : "Team";
+      toast({
+        title: "Workflow Limit Reached",
+        description: `Your ${userPlan} plan allows up to ${workflowLimit} workflows. Upgrade to ${upgradeTo} for more.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setDuplicating(workflow.id);
     try {
       const duplicated = await api.workflows.duplicate(workflow.id);
@@ -288,10 +330,26 @@ export function WorkflowsDialog({ open: controlledOpen, onOpenChange }: Workflow
           )}
 
           {/* Saved Workflows Section */}
-          <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-            <FolderOpen className="h-4 w-4" />
-            Saved Workflows
-          </h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <FolderOpen className="h-4 w-4" />
+              Saved Workflows
+            </h3>
+            {/* Usage indicator */}
+            {!loading && workflowLimit !== -1 && (
+              <div className={cn(
+                "text-xs px-2 py-1 rounded-full font-medium",
+                isAtLimit
+                  ? "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400"
+                  : workflows.length >= workflowLimit * 0.8
+                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400"
+                  : "bg-muted text-muted-foreground"
+              )}>
+                {workflows.length} / {workflowLimit}
+                {isAtLimit && <Lock className="h-3 w-3 ml-1 inline" />}
+              </div>
+            )}
+          </div>
 
           {/* Toolbar with Select All and Bulk Delete */}
           {workflows.length > 0 && (

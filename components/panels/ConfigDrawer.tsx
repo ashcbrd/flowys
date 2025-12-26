@@ -18,7 +18,7 @@ interface TestResult {
 }
 
 export function ConfigDrawer() {
-  const { selectedNode, lastExecution, nodes } = useWorkflowStore();
+  const { selectedNode, lastExecution, executionLogs, nodes } = useWorkflowStore();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("setup");
   const [testInput, setTestInput] = useState("{}");
@@ -296,16 +296,57 @@ export function ConfigDrawer() {
           <TabsContent value="output" className="flex-1 overflow-auto m-0 p-4">
             <div className="space-y-4">
               {(() => {
-                const nodeLog = lastExecution?.logs?.find(
+                // Check real-time execution logs first, then fall back to lastExecution
+                const nodeLog = executionLogs.find(
+                  (log) => log.nodeId === selectedNode.id
+                ) || lastExecution?.logs?.find(
                   (log) => log.nodeId === selectedNode.id
                 );
+
+                if (nodeLog?.status === "running") {
+                  return (
+                    <div className="text-center py-8">
+                      <Loader2 className="h-10 w-10 mx-auto text-blue-500 mb-3 animate-spin" />
+                      <h4 className="font-medium text-sm mb-1">Executing...</h4>
+                      <p className="text-xs text-muted-foreground">
+                        This node is currently running
+                      </p>
+                    </div>
+                  );
+                }
+
+                if (nodeLog?.status === "failed") {
+                  return (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Last run</span>
+                        <span className="font-mono text-xs text-red-500">Failed</span>
+                      </div>
+                      {nodeLog.error && (
+                        <div className="p-3 bg-red-500/10 rounded-lg">
+                          <p className="text-xs font-medium text-red-600 mb-1">Error</p>
+                          <p className="text-xs text-red-600/80">{nodeLog.error}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 return nodeLog?.output ? (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Last run</span>
-                      <span className="font-mono text-xs">
-                        {new Date(nodeLog.startedAt).toLocaleTimeString()}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                        <span className="font-mono text-xs">
+                          {nodeLog.startedAt ? new Date(nodeLog.startedAt).toLocaleTimeString() : ""}
+                        </span>
+                        {nodeLog.duration && (
+                          <span className="text-xs text-muted-foreground">
+                            ({nodeLog.duration}ms)
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <pre className="bg-muted rounded-lg p-3 text-xs overflow-auto max-h-[400px]">
                       {JSON.stringify(nodeLog.output, null, 2)}

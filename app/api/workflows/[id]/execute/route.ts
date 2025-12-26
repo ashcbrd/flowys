@@ -3,6 +3,12 @@ import { v4 as uuid } from "uuid";
 import { connectToDatabase, Workflow, Execution } from "@/lib/db";
 import { createExecutor } from "@/lib/engine";
 import { getAuthenticatedUser, verifyWorkflowOwnership } from "@/lib/auth-helpers";
+import {
+  hasEnoughCredits,
+  deductCredits,
+  validateWorkflowAgainstPlan,
+  calculateWorkflowCost,
+} from "@/lib/subscription";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -22,13 +28,42 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const executionId = uuid();
-    const now = new Date();
 
     // Use nodes/edges from request body if provided (for unsaved changes),
     // otherwise fall back to the saved workflow from database
     const nodesToExecute = body?.nodes && body.nodes.length > 0 ? body.nodes : workflow.nodes;
     const edgesToExecute = body?.edges ? body.edges : workflow.edges;
+
+    // Validate workflow against plan limits (node types, node count)
+    const validation = await validateWorkflowAgainstPlan(user.id, nodesToExecute);
+    if (!validation.valid) {
+      return NextResponse.json(
+        {
+          error: "Plan limit exceeded",
+          details: validation.errors,
+          code: "PLAN_LIMIT_EXCEEDED",
+        },
+        { status: 403 }
+      );
+    }
+
+    // Check if user has enough credits
+    const creditCheck = await hasEnoughCredits(user.id, nodesToExecute);
+    if (!creditCheck.hasCredits) {
+      return NextResponse.json(
+        {
+          error: "Insufficient credits",
+          details: `This workflow requires ${creditCheck.required} credits, but you only have ${creditCheck.remaining} remaining.`,
+          code: "INSUFFICIENT_CREDITS",
+          required: creditCheck.required,
+          remaining: creditCheck.remaining,
+        },
+        { status: 402 }
+      );
+    }
+
+    const executionId = uuid();
+    const now = new Date();
 
     await Execution.create({
       _id: executionId,
@@ -40,6 +75,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const executor = createExecutor(nodesToExecute, edgesToExecute);
     const result = await executor.execute(body?.input || {});
+
+    // Deduct credits after successful execution
+    const creditCost = calculateWorkflowCost(nodesToExecute);
+    const deduction = await deductCredits(user.id, creditCost);
 
     const execution = await Execution.findByIdAndUpdate(
       executionId,
@@ -66,6 +105,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       completedAt: execution!.completedAt,
       createdAt: execution!.createdAt,
       duration: result.duration,
+      credits: {
+        used: creditCost,
+        remaining: deduction.remaining,
+      },
     });
   } catch (error) {
     console.error("Error executing workflow:", error);

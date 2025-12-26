@@ -570,7 +570,12 @@ export const useWorkflowStore = create<WorkflowState>()(
 
       executeWorkflow: async (input) => {
         const { workflow, nodes, edges } = get();
-        set({ isExecuting: true, executionLogs: [] });
+        set({ isExecuting: true, executionLogs: [], lastExecution: null });
+
+        // Dispatch event to open execution drawer
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("execution-started"));
+        }
 
         try {
           let workflowId = workflow?.id;
@@ -596,28 +601,80 @@ export const useWorkflowStore = create<WorkflowState>()(
             set({ workflow: tempWorkflow, currentWorkflowId: tempWorkflow.id });
           }
 
-          // Send current nodes/edges to ensure we use the latest state, not the saved version
-          const execution = await api.workflows.execute(workflowId, {
-            input,
-            nodes: nodes.map((n) => ({
-              id: n.id,
-              type: n.type as NodeType,
-              position: n.position,
-              data: n.data,
-            })),
-            edges: edges.map((e) => ({
-              id: e.id,
-              source: e.source,
-              target: e.target,
-              sourceHandle: e.sourceHandle ?? undefined,
-              targetHandle: e.targetHandle ?? undefined,
-            })),
+          // Use streaming endpoint for real-time updates
+          const response = await fetch(`/api/workflows/${workflowId}/execute/stream`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              input,
+              nodes: nodes.map((n) => ({
+                id: n.id,
+                type: n.type as NodeType,
+                position: n.position,
+                data: n.data,
+              })),
+              edges: edges.map((e) => ({
+                id: e.id,
+                source: e.source,
+                target: e.target,
+                sourceHandle: e.sourceHandle ?? undefined,
+                targetHandle: e.targetHandle ?? undefined,
+              })),
+            }),
           });
-          set({
-            lastExecution: execution,
-            executionLogs: execution.logs || [],
-            isExecuting: false,
-          });
+
+          if (!response.ok) {
+            throw new Error("Failed to start execution");
+          }
+
+          const reader = response.body?.getReader();
+          if (!reader) {
+            throw new Error("No response body");
+          }
+
+          const decoder = new TextDecoder();
+          let buffer = "";
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n\n");
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (!line.trim()) continue;
+
+              const eventMatch = line.match(/^event: (.+)$/m);
+              const dataMatch = line.match(/^data: (.+)$/m);
+
+              if (eventMatch && dataMatch) {
+                const eventType = eventMatch[1];
+                const data = JSON.parse(dataMatch[1]);
+
+                switch (eventType) {
+                  case "node-update":
+                    set({ executionLogs: data.logs });
+                    break;
+                  case "completed":
+                    set({
+                      lastExecution: data,
+                      executionLogs: data.logs || [],
+                      isExecuting: false,
+                    });
+                    // Dispatch event to update credits display
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(new CustomEvent("credits-updated"));
+                    }
+                    break;
+                  case "error":
+                    set({ isExecuting: false });
+                    throw new Error(data.error || "Execution failed");
+                }
+              }
+            }
+          }
         } catch (error) {
           set({ isExecuting: false });
           throw error;
