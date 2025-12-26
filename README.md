@@ -32,10 +32,11 @@ Flowys is a full-stack workflow automation platform that enables you to design, 
 ### Visual Workflow Builder
 
 - **Drag-and-drop canvas** powered by React Flow
-- **6 node types** — Input, API, AI/LLM, Logic, Output, Webhook
+- **7 node types** — Input, API, AI/LLM, Logic, Integration, Webhook, Output
 - **Real-time execution** with live status updates
 - **Undo/Redo** support with full history tracking
-- **Collapsible sidebar** for node library
+- **Auto-layout** for automatic node arrangement
+- **Export/Import** workflows as JSON files
 
 ### AI Integration
 
@@ -44,12 +45,20 @@ Flowys is a full-stack workflow automation platform that enables you to design, 
 - **Structured outputs** with JSON Schema validation
 - **Prompt templates** with `{{variable}}` injection
 
+### AI Assistant (Flux)
+
+- **Built-in chat widget** for workflow assistance
+- **Workflow generation** — Describe what you want, Flux builds it
+- **Error analysis** — AI-powered diagnostics and auto-fix suggestions
+- **Context-aware** — Understands your current workflow state
+
 ### Workflow Management
 
 - **Version control** — Save, restore, and compare workflow versions
 - **Duplicate workflows** — Clone existing workflows instantly
-- **Execution history** — Track all runs with detailed logs
-- **Error analysis** — AI-powered error diagnostics
+- **Execution history** — Track all runs with detailed logs and output drawer
+- **Scheduled runs** — Automate workflows on a schedule
+- **Export/Import** — Share workflows as JSON files
 
 ### Developer API
 
@@ -58,10 +67,45 @@ Flowys is a full-stack workflow automation platform that enables you to design, 
 - **Webhook triggers** — Incoming and outgoing webhooks
 - **Async execution** — Background workflow processing
 
-### AI Assistant
+### Subscription & Billing
 
-- **Built-in chat widget** for workflow assistance
-- **Context-aware suggestions** and troubleshooting
+- **Tiered plans** — Free, Builder, and Team
+- **Credit-based usage** with real-time tracking
+- **Plan-based feature gating** — Node types, limits, and features
+- **In-app subscription management** — Upgrade, downgrade, and cancel
+- **Enterprise contact** — Custom plans for large organizations
+
+---
+
+## Subscription Plans
+
+### Plan Comparison
+
+| Feature | Free | Builder | Team |
+| ------- | ---- | ------- | ---- |
+| Workflows | 3 | 10 | Unlimited |
+| Nodes per workflow | 4 | 25 | Unlimited |
+| Monthly credits | 100 | 500 - 50,000 | 500 - 50,000 |
+| Input, Logic, API, Output nodes | Yes | Yes | Yes |
+| AI nodes | No | Yes | Yes |
+| Webhook nodes | No | Yes | Yes |
+| Integration nodes | No | Yes | Yes |
+| Export/Import | No | Yes | Yes |
+| Flux AI assistant | No | Yes | Yes |
+| Team collaboration | No | No | Yes |
+| Priority support | No | No | Yes |
+
+### Credit Costs per Node
+
+| Node Type | Credit Cost |
+| --------- | ----------- |
+| Input | Free |
+| Output | Free |
+| Logic | 1 credit |
+| API | 1 credit |
+| Webhook | 1 credit |
+| Integration | 1 credit |
+| AI | 10 credits |
 
 ---
 
@@ -121,21 +165,31 @@ flowys/
 │   │   ├── executions/         # Execution history
 │   │   ├── webhooks/           # Webhook management
 │   │   ├── api-keys/           # API key management
-│   │   └── chat/               # AI chat endpoint
+│   │   ├── billing/            # Subscription & checkout
+│   │   ├── contact/            # Enterprise contact form
+│   │   └── flux/               # AI assistant endpoint
 │   ├── workflow/               # Workflow editor pages
 │   │   ├── [id]/               # Edit workflow by ID
 │   │   └── [id]/version/       # View workflow versions
+│   ├── settings/               # Settings pages
+│   │   ├── subscription/       # Subscription management
+│   │   ├── webhooks/           # Webhook configuration
+│   │   └── api-keys/           # API key management
+│   ├── contact/                # Enterprise contact page
+│   ├── pricing/                # Pricing page
 │   └── docs/                   # Documentation page
 ├── components/
 │   ├── canvas/                 # Workflow canvas
 │   ├── nodes/                  # Node type components
 │   ├── panels/                 # UI panels (sidebar, header, etc.)
-│   ├── chat/                   # AI chat widget
+│   ├── flux/                   # AI chat widget
+│   ├── shared/                 # Shared components (PricingSection, UpgradeModal)
 │   └── ui/                     # Primitives (button, input, etc.)
 ├── lib/
 │   ├── engine/                 # Workflow execution engine
 │   ├── nodes/                  # Node handlers
 │   ├── providers/              # LLM provider implementations
+│   ├── payments/               # DodoPayments integration
 │   ├── db/                     # MongoDB schemas & models
 │   ├── middleware/             # Auth middleware
 │   └── services/               # Webhook service
@@ -174,7 +228,7 @@ HTTP requests to external services with template variable support.
 
 ### AI Node
 
-LLM inference with structured JSON output.
+LLM inference with structured JSON output. **Requires Builder or Team plan.**
 
 ```json
 {
@@ -205,13 +259,23 @@ Data transformation and filtering operations.
 | `condition` | Branch based on expression       |
 | `transform` | Custom JavaScript transformation |
 
-### Output Node
+### Integration Node
 
-Format and return final workflow results.
+Connect to third-party apps. **Requires Builder or Team plan.**
+
+- Slack
+- GitHub
+- Gmail
+- Google Sheets
+- And more...
 
 ### Webhook Node
 
-Trigger outgoing HTTP requests on workflow events.
+Trigger outgoing HTTP requests on workflow events. **Requires Builder or Team plan.**
+
+### Output Node
+
+Format and return final workflow results.
 
 ---
 
@@ -342,13 +406,12 @@ Subscribe to workflow events and receive HTTP callbacks.
 
 Flowys uses [DodoPayments](https://dodopayments.com) for subscription billing with a credit-based system.
 
-### Subscription Plans
+### Subscription Features
 
-| Plan    | Description                                      | Credits        |
-| ------- | ------------------------------------------------ | -------------- |
-| Free    | Limited credits, basic features                  | 100/month      |
-| Builder | For individual developers building automations   | 500 - 50,000   |
-| Team    | For teams with collaboration features            | 500 - 50,000   |
+- **Real-time credits display** in header
+- **In-app upgrade modal** — Upgrade without leaving the editor
+- **Cancel subscription** — Cancel at period end or immediately
+- **Usage tracking** — Monitor credit consumption
 
 ### Credit Tiers
 
@@ -457,12 +520,11 @@ https://your-domain.com/api/webhooks/dodo
 
 ### Billing API Endpoints
 
-| Method | Endpoint              | Description                    |
-| ------ | --------------------- | ------------------------------ |
-| GET    | `/api/billing`        | Get subscription & usage info  |
-| PATCH  | `/api/billing`        | Change plan or cancel          |
-| POST   | `/api/billing/checkout` | Create checkout session      |
-| POST   | `/api/billing/portal` | Open customer portal           |
+| Method | Endpoint                | Description                   |
+| ------ | ----------------------- | ----------------------------- |
+| GET    | `/api/subscription`     | Get subscription & usage info |
+| POST   | `/api/billing/checkout` | Create checkout session       |
+| POST   | `/api/billing/cancel`   | Cancel subscription           |
 
 ---
 

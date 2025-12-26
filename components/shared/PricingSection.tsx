@@ -63,10 +63,10 @@ export function PricingSection({
 
   // Handle plan selection on landing page (no onCheckout provided)
   const handleLandingCheckout = async (plan: "builder" | "team") => {
-    // If not logged in, redirect to login with return URL
+    // If not logged in, open login in new tab with return URL
     if (status === "unauthenticated" || !session) {
       const returnUrl = encodeURIComponent(`/pricing?plan=${plan}&tier=${selectedTierIndex}`);
-      router.push(`/login?callbackUrl=${returnUrl}`);
+      window.open(`/login?callbackUrl=${returnUrl}`, "_blank");
       return;
     }
 
@@ -497,14 +497,14 @@ export function PricingSection({
             </div>
 
             {currentPlan === "team" ? (
-              <div className="w-full py-2.5 text-center bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 font-medium rounded-xl text-sm">
+              <div className="w-full py-2.5 text-center bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-medium rounded-xl text-sm">
                 Current Plan
               </div>
             ) : isInteractive ? (
               <button
                 onClick={() => handleCheckout("team")}
                 disabled={isCheckingOut}
-                className="block w-full py-2.5 text-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl transition-all shadow-md text-sm disabled:opacity-50"
+                className="block w-full py-2.5 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors text-sm disabled:opacity-50"
               >
                 {checkingOutPlan === "team" ? (
                   <Loader2 className="h-4 w-4 animate-spin mx-auto" />
@@ -516,7 +516,7 @@ export function PricingSection({
               <button
                 onClick={() => handleLandingCheckout("team")}
                 disabled={isRedirecting || status === "loading"}
-                className="block w-full py-2.5 text-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl transition-all shadow-md text-sm disabled:opacity-50"
+                className="block w-full py-2.5 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors text-sm disabled:opacity-50"
               >
                 {checkingOutPlan === "team" ? (
                   <Loader2 className="h-4 w-4 animate-spin mx-auto" />
