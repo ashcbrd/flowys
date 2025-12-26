@@ -81,31 +81,31 @@ Flowys is a full-stack workflow automation platform that enables you to design, 
 
 ### Plan Comparison
 
-| Feature | Free | Builder | Team |
-| ------- | ---- | ------- | ---- |
-| Workflows | 3 | 10 | Unlimited |
-| Nodes per workflow | 4 | 25 | Unlimited |
-| Monthly credits | 100 | 500 - 50,000 | 500 - 50,000 |
-| Input, Logic, API, Output nodes | Yes | Yes | Yes |
-| AI nodes | No | Yes | Yes |
-| Webhook nodes | No | Yes | Yes |
-| Integration nodes | No | Yes | Yes |
-| Export/Import | No | Yes | Yes |
-| Flux AI assistant | No | Yes | Yes |
-| Team collaboration | No | No | Yes |
-| Priority support | No | No | Yes |
+| Feature                         | Free | Builder      | Team         |
+| ------------------------------- | ---- | ------------ | ------------ |
+| Workflows                       | 3    | 10           | Unlimited    |
+| Nodes per workflow              | 4    | 25           | Unlimited    |
+| Monthly credits                 | 100  | 500 - 50,000 | 500 - 50,000 |
+| Input, Logic, API, Output nodes | Yes  | Yes          | Yes          |
+| AI nodes                        | No   | Yes          | Yes          |
+| Webhook nodes                   | No   | Yes          | Yes          |
+| Integration nodes               | No   | Yes          | Yes          |
+| Export/Import                   | No   | Yes          | Yes          |
+| Flux AI assistant               | No   | Yes          | Yes          |
+| Team collaboration              | No   | No           | Yes          |
+| Priority support                | No   | No           | Yes          |
 
 ### Credit Costs per Node
 
-| Node Type | Credit Cost |
-| --------- | ----------- |
-| Input | Free |
-| Output | Free |
-| Logic | 1 credit |
-| API | 1 credit |
-| Webhook | 1 credit |
-| Integration | 1 credit |
-| AI | 10 credits |
+| Node Type   | Credit Cost |
+| ----------- | ----------- |
+| Input       | Free        |
+| Output      | Free        |
+| Logic       | 1 credit    |
+| API         | 1 credit    |
+| Webhook     | 1 credit    |
+| Integration | 1 credit    |
+| AI          | 10 credits  |
 
 ---
 
@@ -121,7 +121,7 @@ Flowys is a full-stack workflow automation platform that enables you to design, 
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/flowys.git
+git clone https://github.com/ashcbrd/flowys.git
 cd flowys
 
 # Install dependencies
@@ -287,7 +287,7 @@ All API v1 endpoints require Bearer token authentication:
 
 ```bash
 curl -H "Authorization: Bearer ask_YOUR_API_KEY" \
-     https://your-domain.com/api/v1/workflows
+     https://flowys.vercel.app/api/v1/workflows
 ```
 
 ### Workflows
@@ -440,11 +440,13 @@ Each paid plan offers 7 credit tiers:
 For each tier in both plans, create a subscription product in DodoPayments:
 
 **Builder Plan Products:**
+
 - Name: `Builder - 500 Credits`, Price: $9/mo, Billing: Monthly
 - Name: `Builder - 1,000 Credits`, Price: $15/mo, Billing: Monthly
 - ... (repeat for all 7 tiers)
 
 **Team Plan Products:**
+
 - Name: `Team - 500 Credits`, Price: $19/mo, Billing: Monthly
 - Name: `Team - 1,000 Credits`, Price: $29/mo, Billing: Monthly
 - ... (repeat for all 7 tiers)
@@ -514,8 +516,9 @@ DODO_WEBHOOK_SECRET_LIVE=your_live_webhook_secret
 **Webhook Setup for Production:**
 
 In DodoPayments **live mode** dashboard, add webhook endpoint:
+
 ```
-https://your-domain.com/api/webhooks/dodo
+https://flowys.vercel.app/api/webhooks/dodo
 ```
 
 ### Billing API Endpoints
@@ -532,19 +535,19 @@ https://your-domain.com/api/webhooks/dodo
 
 ### Environment Variables
 
-| Variable                      | Description                        | Required |
-| ----------------------------- | ---------------------------------- | -------- |
-| `MONGODB_URI`                 | MongoDB connection string          | Yes      |
-| `ENCRYPTION_KEY`              | 32+ char key for credential encryption | Yes  |
-| `OPENAI_API_KEY`              | OpenAI API key                     | No\*     |
-| `ANTHROPIC_API_KEY`           | Anthropic API key                  | No\*     |
-| `DODO_PAYMENTS_ENVIRONMENT`   | `test_mode` or `live_mode`         | Yes\*\*  |
-| `DODO_PAYMENTS_API_KEY_TEST`  | DodoPayments test API key          | Yes\*\*  |
-| `DODO_WEBHOOK_SECRET_TEST`    | DodoPayments test webhook secret   | Yes\*\*  |
-| `DODO_PAYMENTS_API_KEY_LIVE`  | DodoPayments live API key          | No\*\*\* |
-| `DODO_WEBHOOK_SECRET_LIVE`    | DodoPayments live webhook secret   | No\*\*\* |
-| `DODO_PRODUCT_TEST_*`         | Test mode product IDs (14 total)   | Yes\*\*  |
-| `DODO_PRODUCT_LIVE_*`         | Live mode product IDs (14 total)   | No\*\*\* |
+| Variable                     | Description                            | Required |
+| ---------------------------- | -------------------------------------- | -------- |
+| `MONGODB_URI`                | MongoDB connection string              | Yes      |
+| `ENCRYPTION_KEY`             | 32+ char key for credential encryption | Yes      |
+| `OPENAI_API_KEY`             | OpenAI API key                         | No\*     |
+| `ANTHROPIC_API_KEY`          | Anthropic API key                      | No\*     |
+| `DODO_PAYMENTS_ENVIRONMENT`  | `test_mode` or `live_mode`             | Yes\*\*  |
+| `DODO_PAYMENTS_API_KEY_TEST` | DodoPayments test API key              | Yes\*\*  |
+| `DODO_WEBHOOK_SECRET_TEST`   | DodoPayments test webhook secret       | Yes\*\*  |
+| `DODO_PAYMENTS_API_KEY_LIVE` | DodoPayments live API key              | No\*\*\* |
+| `DODO_WEBHOOK_SECRET_LIVE`   | DodoPayments live webhook secret       | No\*\*\* |
+| `DODO_PRODUCT_TEST_*`        | Test mode product IDs (14 total)       | Yes\*\*  |
+| `DODO_PRODUCT_LIVE_*`        | Live mode product IDs (14 total)       | No\*\*\* |
 
 \* At least one LLM provider key is required for AI nodes.
 
