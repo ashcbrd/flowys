@@ -18,6 +18,7 @@ import {
   Users,
   Check,
   Sparkles,
+  X,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
@@ -67,6 +68,246 @@ function PixelBackground() {
       <div className="absolute top-40 right-20 w-96 h-96 bg-sky-400/10 dark:bg-sky-400/20 rounded-full blur-3xl animate-blob animation-delay-2000" />
       <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-indigo-400/10 dark:bg-indigo-400/20 rounded-full blur-3xl animate-blob animation-delay-4000" />
     </div>
+  );
+}
+
+// Pricing tiers configuration
+const PRICING_TIERS = [
+  { credits: 500, proPrice: 9, businessPrice: 19 },
+  { credits: 1000, proPrice: 15, businessPrice: 29 },
+  { credits: 2500, proPrice: 29, businessPrice: 49 },
+  { credits: 5000, proPrice: 49, businessPrice: 79 },
+  { credits: 10000, proPrice: 79, businessPrice: 129 },
+  { credits: 25000, proPrice: 149, businessPrice: 229 },
+  { credits: 50000, proPrice: 249, businessPrice: 399 },
+];
+
+function PricingSection() {
+  const [selectedTierIndex, setSelectedTierIndex] = useState(2); // Default to 2,500 credits
+  const selectedTier = PRICING_TIERS[selectedTierIndex];
+
+  const formatCredits = (credits: number) => {
+    return credits >= 1000 ? `${(credits / 1000).toFixed(credits % 1000 === 0 ? 0 : 1)}k` : credits.toString();
+  };
+
+  return (
+    <section id="pricing" className="py-24 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            Free to start. Simple to scale.
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Build your first workflow in minutes—no credit card required. Upgrade only when you&apos;re ready.
+          </p>
+        </div>
+
+        {/* Credits explainer */}
+        <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900 rounded-xl p-6 mb-8 max-w-3xl mx-auto">
+          <h4 className="font-semibold text-foreground mb-3">Quick credit math:</h4>
+          <div className="grid sm:grid-cols-3 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-muted-foreground">Logic & transforms: <strong className="text-foreground">1 credit</strong></span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="text-muted-foreground">AI processing: <strong className="text-foreground">10 credits</strong></span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-amber-500" />
+              <span className="text-muted-foreground">Webhook triggers: <strong className="text-foreground">1 credit</strong></span>
+            </div>
+          </div>
+        </div>
+
+        {/* Credits Slider - Above Cards */}
+        <div className="max-w-2xl mx-auto mb-12">
+          <p className="text-sm font-medium text-muted-foreground text-center mb-4">Select your monthly credits</p>
+          <div className="px-2">
+            <input
+              type="range"
+              min="0"
+              max={PRICING_TIERS.length - 1}
+              value={selectedTierIndex}
+              onChange={(e) => setSelectedTierIndex(parseInt(e.target.value))}
+              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-blue-600"
+            />
+            <div className="flex justify-between mt-4">
+              {PRICING_TIERS.map((tier, index) => (
+                <button
+                  key={tier.credits}
+                  onClick={() => setSelectedTierIndex(index)}
+                  className={`text-xs px-2 py-1 rounded transition-colors ${
+                    index === selectedTierIndex
+                      ? "bg-blue-600 text-white"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {formatCredits(tier.credits)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Free Tier */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
+            <h3 className="text-lg font-medium text-muted-foreground mb-2">Free</h3>
+            <div className="flex items-baseline gap-2 mb-2">
+              <span className="text-4xl font-bold text-foreground">$0</span>
+              <span className="text-muted-foreground">/month</span>
+            </div>
+            <p className="text-emerald-600 dark:text-emerald-400 font-medium text-sm mb-4">500 credits/month</p>
+            <p className="text-muted-foreground text-sm mb-6">Perfect for getting started. No strings attached.</p>
+
+            <div className="space-y-3 mb-6">
+              <ul className="space-y-2">
+                {[
+                  "3 workflows",
+                  "4 nodes per workflow",
+                  "Input, Logic, API & Output nodes",
+                  "Community support",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-foreground text-sm">
+                    <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="pt-3 border-t border-border">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Not included:</p>
+                <ul className="space-y-2">
+                  {[
+                    "AI nodes",
+                    "Webhook triggers",
+                    "App integrations",
+                    "Import/Export",
+                    "AI chatbot",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <X className="w-4 h-4 text-muted-foreground/50 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <Link
+              href="/workflow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-2.5 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors text-sm"
+            >
+              Get Started for Free
+            </Link>
+          </div>
+
+          {/* Pro Tier */}
+          <div className="rounded-2xl border-2 border-blue-500 bg-card p-6 relative shadow-xl shadow-blue-500/10">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-blue-600 text-white text-xs font-medium rounded-full">
+              Most Popular
+            </div>
+            <h3 className="text-lg font-medium text-muted-foreground mb-2">Pro</h3>
+            <div className="flex items-baseline gap-2 mb-2">
+              <span className="text-4xl font-bold text-foreground">${selectedTier.proPrice}</span>
+              <span className="text-muted-foreground">/month</span>
+            </div>
+            <p className="text-blue-600 dark:text-blue-400 font-medium text-sm mb-4">
+              {selectedTier.credits.toLocaleString()} credits/month
+            </p>
+            <p className="text-muted-foreground text-sm mb-6">For serious builders who want the full toolkit.</p>
+
+            <div className="space-y-3 mb-6">
+              <p className="text-xs font-medium text-foreground">Everything in Free, plus:</p>
+              <ul className="space-y-2">
+                {[
+                  "10 workflows",
+                  "25 nodes per workflow",
+                  "AI nodes (GPT-4, Claude)",
+                  "Webhook triggers",
+                  "App integrations",
+                  "Import/Export workflows",
+                  "AI chatbot assistant",
+                  "Email support",
+                  "Credit rollover",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-foreground text-sm">
+                    <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <Link
+              href="/workflow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-2.5 text-center bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all shadow-md text-sm"
+            >
+              Choose Pro
+            </Link>
+          </div>
+
+          {/* Business Tier */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
+            <h3 className="text-lg font-medium text-muted-foreground mb-2">Business</h3>
+            <div className="flex items-baseline gap-2 mb-2">
+              <span className="text-4xl font-bold text-foreground">${selectedTier.businessPrice}</span>
+              <span className="text-muted-foreground">/month</span>
+            </div>
+            <p className="text-blue-600 dark:text-blue-400 font-medium text-sm mb-4">
+              {selectedTier.credits.toLocaleString()} credits/month
+            </p>
+            <p className="text-muted-foreground text-sm mb-6">For teams that need no limits and priority support.</p>
+
+            <div className="space-y-3 mb-6">
+              <p className="text-xs font-medium text-foreground">Everything in Pro, plus:</p>
+              <ul className="space-y-2">
+                {[
+                  "Unlimited workflows",
+                  "Unlimited nodes per workflow",
+                  "Team collaboration",
+                  "Advanced analytics",
+                  "Custom integrations",
+                  "Priority execution",
+                  "Priority support",
+                  "Dedicated account manager",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-foreground text-sm">
+                    <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <Link
+              href="/workflow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-2.5 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors text-sm"
+            >
+              Choose Business
+            </Link>
+          </div>
+        </div>
+
+        {/* Enterprise callout */}
+        <div className="mt-12 text-center">
+          <p className="text-muted-foreground">
+            Need 100,000+ credits, custom SLAs, or on-premise deployment?{" "}
+            <button className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
+              Let&apos;s talk Enterprise
+            </button>
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -160,7 +401,7 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center gap-2 shadow-md shadow-blue-500/20"
             >
-              Try It Now
+              Start Free
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -171,20 +412,20 @@ export default function LandingPage() {
       <section className="pt-32 pb-20 px-6 bg-gradient-to-b from-blue-50/50 to-background dark:from-blue-950/30 dark:to-background relative overflow-hidden">
         <PixelBackground />
         <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-full text-blue-700 dark:text-blue-300 text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
-            Visual AI workflow builder
+            Free forever. No credit card.
           </div>
           <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
-            Stop writing scripts.
+            Automate anything.
             <br />
             <span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
-              Start building workflows.
+              Ship in minutes.
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-            Turn hours of manual work into minutes. Drag, drop, and connect AI-powered nodes
-            to automate anything—no code, no complexity, no learning curve.
+            Build powerful AI workflows by dragging and dropping nodes. No code needed.
+            Start free and automate the boring stuff today.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -194,14 +435,14 @@ export default function LandingPage() {
               className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-lg shadow-blue-500/25"
             >
               <Play className="w-5 h-5" />
-              Start Building
+              Start Free
             </Link>
             <Link
               href="/tutorial"
               className="w-full sm:w-auto px-8 py-4 bg-background hover:bg-muted border border-border text-foreground font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 text-lg shadow-sm"
             >
               <Play className="w-5 h-5" />
-              Try the Tutorial
+              Try the Interactive Tutorial
             </Link>
           </div>
         </div>
@@ -292,9 +533,9 @@ export default function LandingPage() {
             <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Puzzle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-3">Build in minutes, not days</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-3">Zero learning curve</h3>
             <p className="text-muted-foreground leading-relaxed">
-              If you can draw a flowchart, you can build a workflow. No tutorials needed—just drag, connect, and run.
+              If you can draw a flowchart, you can build a workflow. Drag nodes, connect them, hit run. That&apos;s it.
             </p>
           </div>
           <div className="text-center">
@@ -310,9 +551,9 @@ export default function LandingPage() {
             <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <DollarSign className="w-8 h-8 text-amber-600 dark:text-amber-400" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-3">Pay for results, not seats</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-3">Free to start, fair to scale</h3>
             <p className="text-muted-foreground leading-relaxed">
-              No per-user fees. No hidden costs. Simple credit-based pricing—start free, scale as you grow.
+              No credit card. No per-user fees. Build your first workflow today, upgrade only when you&apos;re ready.
             </p>
           </div>
         </div>
@@ -323,11 +564,11 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Every tool you need. None you don't.
+              Everything you need. Nothing you don&apos;t.
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Built for makers who ship fast. Simple enough for your first workflow,
-              powerful enough for production.
+              Powerful enough for production, simple enough for your first workflow.
+              Start building for free, unlock more as you grow.
             </p>
           </div>
 
@@ -418,10 +659,10 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Build once. Run forever.
+              Three steps. That&apos;s it.
             </h2>
             <p className="text-xl text-muted-foreground">
-              Go from idea to working automation in under 5 minutes.
+              Go from idea to working automation in under 5 minutes—for free.
             </p>
           </div>
 
@@ -464,159 +705,16 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Predictable pricing. No surprises.
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Credits refresh monthly. Unused credits roll over. Cancel anytime.
-            </p>
-          </div>
-
-          {/* Credits explainer */}
-          <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900 rounded-xl p-6 mb-12 max-w-3xl mx-auto">
-            <h4 className="font-semibold text-foreground mb-3">Quick credit math:</h4>
-            <div className="grid sm:grid-cols-3 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-muted-foreground">Logic & transforms: <strong className="text-foreground">1 credit</strong></span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
-                <span className="text-muted-foreground">AI processing: <strong className="text-foreground">10 credits</strong></span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-amber-500" />
-                <span className="text-muted-foreground">Webhook triggers: <strong className="text-foreground">1 credit</strong></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Starter Tier */}
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">Starter</h3>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-bold text-foreground">$9</span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-              <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">500 credits/month</p>
-              <p className="text-muted-foreground mb-8">For personal projects and testing ideas.</p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  "Unlimited workflows",
-                  "All node types",
-                  "Webhook triggers",
-                  "Community support",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-foreground">
-                    <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/workflow"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors"
-              >
-                Choose Starter
-              </Link>
-            </div>
-
-            {/* Pro Tier */}
-            <div className="rounded-2xl border-2 border-blue-500 bg-card p-8 relative shadow-xl shadow-blue-500/10">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
-                Most Popular
-              </div>
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">Pro</h3>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-bold text-foreground">$29</span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-              <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">2,500 credits/month</p>
-              <p className="text-muted-foreground mb-8">For serious automation. Most teams start here.</p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  "Everything in Starter",
-                  "API access",
-                  "Priority execution",
-                  "Priority support",
-                  "Credit rollover",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-foreground">
-                    <Check className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/workflow"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3 text-center bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all shadow-md"
-              >
-                Choose Pro
-              </Link>
-            </div>
-
-            {/* Business Tier */}
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-lg">
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">Business</h3>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-bold text-foreground">$79</span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-              <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">10,000 credits/month</p>
-              <p className="text-muted-foreground mb-8">For teams running workflows at scale.</p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  "Everything in Pro",
-                  "Team collaboration",
-                  "Advanced analytics",
-                  "Custom integrations",
-                  "Dedicated support",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-foreground">
-                    <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/workflow"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3 text-center bg-muted hover:bg-muted/80 text-foreground font-medium rounded-xl transition-colors"
-              >
-                Contact Sales
-              </Link>
-            </div>
-          </div>
-
-          {/* Enterprise callout */}
-          <div className="mt-12 text-center">
-            <p className="text-muted-foreground">
-              Need 50,000+ credits or custom integrations?{" "}
-              <button className="text-blue-600 dark:text-blue-400 font-medium hover:underline">
-                Let's talk Enterprise
-              </button>
-            </p>
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* CTA Section */}
       <section className="py-24 px-6 bg-gradient-to-br from-blue-600 to-blue-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Your first automation is 5 minutes away
+            Ready to stop doing things manually?
           </h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            No credit card required. No sales calls. Just drag, drop, and ship.
+            Join thousands of makers who automated their busywork. Free forever—upgrade when you need more.
           </p>
           <Link
             href="/workflow"
@@ -625,7 +723,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-3 px-10 py-5 bg-white hover:bg-gray-50 text-blue-700 font-semibold rounded-xl transition-all duration-200 text-lg shadow-lg"
           >
             <Zap className="w-6 h-6" />
-            Start Building
+            Get Started for Free
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

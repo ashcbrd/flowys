@@ -102,6 +102,10 @@ interface WorkflowState {
   // Layout
   beautifyLayout: () => void;
   hasConnectedNodes: () => boolean;
+
+  // Export/Import
+  exportWorkflow: () => void;
+  importWorkflow: (file: File) => Promise<void>;
 }
 
 const generateId = () => `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -340,6 +344,57 @@ export const useWorkflowStore = create<WorkflowState>()(
         }));
 
         setNodes(layoutedNodes);
+      },
+
+      exportWorkflow: () => {
+        const { nodes, edges, workflow } = get();
+        const name = workflow?.name || "Untitled Workflow";
+        const description = workflow?.description;
+
+        // Dynamic import to avoid SSR issues
+        import("@/lib/workflow-io").then(({ createWorkflowExport, workflowToJson, downloadWorkflow }) => {
+          const exportData = createWorkflowExport(name, description, nodes, edges);
+          const json = workflowToJson(exportData);
+          downloadWorkflow(name, json);
+        });
+      },
+
+      importWorkflow: async (file: File) => {
+        const { setNodes, setEdges, pushHistory, clearDraft } = get();
+
+        const { readFileAsText, parseWorkflowImport, remapWorkflowIds } = await import("@/lib/workflow-io");
+
+        const text = await readFileAsText(file);
+        const importData = parseWorkflowImport(text);
+
+        // Generate new IDs to avoid conflicts
+        const { nodes: newNodes, edges: newEdges } = remapWorkflowIds(
+          importData.workflow.nodes,
+          importData.workflow.edges
+        );
+
+        // Push current state to history before replacing
+        pushHistory();
+
+        // Set the imported workflow
+        setNodes(newNodes);
+        setEdges(newEdges);
+
+        // Clear any existing draft and update state
+        clearDraft();
+        set({
+          workflow: {
+            id: "",
+            name: importData.workflow.name,
+            description: importData.workflow.description,
+            nodes: newNodes,
+            edges: newEdges,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          currentWorkflowId: null,
+          workflowStatus: "draft",
+        });
       },
 
       onNodesChange: (changes) => {

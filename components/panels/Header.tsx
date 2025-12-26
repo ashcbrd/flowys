@@ -27,6 +27,8 @@ import {
   Wand2,
   LogOut,
   User,
+  Download,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,6 +76,8 @@ export function Header() {
     canRedo,
     beautifyLayout,
     hasConnectedNodes,
+    exportWorkflow,
+    importWorkflow,
   } = useWorkflowStore();
   const { toast } = useToast();
 
@@ -87,6 +91,7 @@ export function Header() {
   const [runInput, setRunInput] = useState("{}");
   const [isSaving, setIsSaving] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const workflowName = workflow?.name || "Untitled Workflow";
 
@@ -192,6 +197,41 @@ export function Header() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleExport = () => {
+    exportWorkflow();
+    toast({
+      title: "Exported",
+      description: "Workflow downloaded as JSON",
+    });
+  };
+
+  const handleImportClick = () => {
+    importInputRef.current?.click();
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await importWorkflow(file);
+      router.replace("/workflow");
+      toast({
+        title: "Imported",
+        description: "Workflow loaded successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Import Failed",
+        description: error instanceof Error ? error.message : "Invalid workflow file",
+        variant: "destructive",
+      });
+    }
+
+    // Reset file input
+    e.target.value = "";
   };
 
   const getStatusIndicator = (status: WorkflowStatus) => {
@@ -420,6 +460,14 @@ export function Header() {
                   Version History
                 </DropdownMenuItem>
               )}
+              <DropdownMenuItem onClick={handleExport}>
+                <Download className="h-4 w-4" />
+                Export Workflow
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleImportClick}>
+                <Upload className="h-4 w-4" />
+                Import Workflow
+              </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
@@ -537,6 +585,15 @@ export function Header() {
         onOpenChange={setSchedulesOpen}
         workflowId={currentWorkflowId || undefined}
         workflowName={workflow?.name}
+      />
+
+      {/* Hidden file input for import */}
+      <input
+        ref={importInputRef}
+        type="file"
+        accept=".json"
+        onChange={handleImportFile}
+        className="hidden"
       />
     </>
   );
