@@ -30,14 +30,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/shared/Navbar";
 import { cn } from "@/lib/utils";
 
-const API_SCOPES: { value: ApiKeyScope; label: string; description: string }[] = [
+// Individual scopes (without full_access)
+const INDIVIDUAL_SCOPES: { value: ApiKeyScope; label: string; description: string }[] = [
   { value: "workflows:read", label: "Read Workflows", description: "View workflow details" },
   { value: "workflows:write", label: "Write Workflows", description: "Create and update workflows" },
   { value: "workflows:execute", label: "Execute Workflows", description: "Run workflows via API" },
   { value: "executions:read", label: "Read Executions", description: "View execution history" },
   { value: "webhooks:read", label: "Read Webhooks", description: "View webhook configurations" },
   { value: "webhooks:write", label: "Write Webhooks", description: "Manage webhooks" },
-  { value: "full_access", label: "Full Access", description: "All permissions" },
 ];
 
 export default function ApiKeysPage() {
@@ -353,32 +353,83 @@ export default function ApiKeysPage() {
                 <div>
                   <label className="text-sm font-medium">Permissions</label>
                   <div className="space-y-2 mt-2">
-                    {API_SCOPES.map((scope) => (
-                      <label key={scope.value} className="flex items-start gap-2">
-                        <input
-                          type="checkbox"
-                          checked={apiKeyForm.scopes.includes(scope.value)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setApiKeyForm({
-                                ...apiKeyForm,
-                                scopes: [...apiKeyForm.scopes, scope.value],
-                              });
-                            } else {
-                              setApiKeyForm({
-                                ...apiKeyForm,
-                                scopes: apiKeyForm.scopes.filter((s) => s !== scope.value),
-                              });
-                            }
-                          }}
-                          className="rounded mt-1"
-                        />
-                        <div>
-                          <span className="text-sm font-medium">{scope.label}</span>
-                          <p className="text-xs text-muted-foreground">{scope.description}</p>
-                        </div>
-                      </label>
-                    ))}
+                    {/* Full Access - Master checkbox */}
+                    <label className="flex items-start gap-2 pb-2 border-b">
+                      <input
+                        type="checkbox"
+                        checked={apiKeyForm.scopes.includes("full_access")}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            // Check full_access and all individual scopes
+                            const allScopes: ApiKeyScope[] = [
+                              "full_access",
+                              ...INDIVIDUAL_SCOPES.map((s) => s.value),
+                            ];
+                            setApiKeyForm({
+                              ...apiKeyForm,
+                              scopes: allScopes,
+                            });
+                          } else {
+                            // Uncheck all scopes
+                            setApiKeyForm({
+                              ...apiKeyForm,
+                              scopes: [],
+                            });
+                          }
+                        }}
+                        className="rounded mt-1"
+                      />
+                      <div>
+                        <span className="text-sm font-medium">Full Access</span>
+                        <p className="text-xs text-muted-foreground">All permissions</p>
+                      </div>
+                    </label>
+
+                    {/* Individual scopes as sub-items */}
+                    <div className="pl-6 space-y-2">
+                      {INDIVIDUAL_SCOPES.map((scope) => (
+                        <label key={scope.value} className="flex items-start gap-2">
+                          <input
+                            type="checkbox"
+                            checked={apiKeyForm.scopes.includes(scope.value)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                const newScopes = [...apiKeyForm.scopes, scope.value];
+                                // Check if all individual scopes are now selected
+                                const allIndividualSelected = INDIVIDUAL_SCOPES.every((s) =>
+                                  newScopes.includes(s.value)
+                                );
+                                if (allIndividualSelected) {
+                                  // Also check full_access
+                                  setApiKeyForm({
+                                    ...apiKeyForm,
+                                    scopes: [...newScopes, "full_access"],
+                                  });
+                                } else {
+                                  setApiKeyForm({
+                                    ...apiKeyForm,
+                                    scopes: newScopes,
+                                  });
+                                }
+                              } else {
+                                // Uncheck this scope and also uncheck full_access
+                                setApiKeyForm({
+                                  ...apiKeyForm,
+                                  scopes: apiKeyForm.scopes.filter(
+                                    (s) => s !== scope.value && s !== "full_access"
+                                  ),
+                                });
+                              }
+                            }}
+                            className="rounded mt-1"
+                          />
+                          <div>
+                            <span className="text-sm font-medium">{scope.label}</span>
+                            <p className="text-xs text-muted-foreground">{scope.description}</p>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

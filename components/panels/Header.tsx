@@ -271,7 +271,7 @@ export function Header() {
   };
 
   // Check if feature requires paid plan
-  const isFeatureLocked = (feature: "importExport" | "integrations" | "webhooks") => {
+  const isFeatureLocked = (feature: "importExport" | "integrations") => {
     if (userPlan === "free") {
       return true;
     }
@@ -598,29 +598,12 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                 )}
-                {isFeatureLocked("webhooks") ? (
-                  <DropdownMenuItem
-                    className="opacity-60"
-                    onClick={() => {
-                      toast({
-                        title: "Upgrade Required",
-                        description: "Webhooks require a Builder plan or higher.",
-                        variant: "destructive",
-                      });
-                    }}
-                  >
+                <DropdownMenuItem asChild>
+                  <Link href="/settings/webhooks">
                     <Webhook className="h-4 w-4" />
                     Webhooks
-                    <Lock className="h-3 w-3 ml-auto text-amber-500" />
-                  </DropdownMenuItem>
-                ) : (
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings/webhooks">
-                      <Webhook className="h-4 w-4" />
-                      Webhooks
-                    </Link>
-                  </DropdownMenuItem>
-                )}
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings/api-keys">
                     <Key className="h-4 w-4" />
